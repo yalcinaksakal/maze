@@ -1,12 +1,13 @@
 import {
-  BoxBufferGeometry,
+  // BoxBufferGeometry,
   Color,
-  Mesh,
-  MeshBasicMaterial,
+  // Mesh,
+  // MeshBasicMaterial,
   Scene,
 } from "three";
 
 import myCam from "./camera";
+import createNodes, { createWalls } from "./createNodes";
 import createPlane from "./createPlane";
 
 import createLights from "./lights";
@@ -35,15 +36,19 @@ const setScene = (appenderFunc, dispatch, actions) => {
 
   //cube
 
-  const geometry = new BoxBufferGeometry(30, 200, 30);
-  const material = new MeshBasicMaterial({ color: "gray" });
-  const cube = new Mesh(geometry, material);
-  cube.castShadow = true;
-  cube.position.set(0, 101, 0);
-  scene.add(cube);
+  // const geometry = new BoxBufferGeometry(30, 200, 30);
+  // const material = new MeshBasicMaterial({ color: "gray" });
+  // const cube = new Mesh(geometry, material);
+  // cube.castShadow = true;
+  // cube.position.set(0, 101, 0);
+  // scene.add(cube);
 
   //plane
   scene.add(createPlane());
+
+  //nodes and walls
+  scene.add(createNodes());
+  scene.add(createWalls());
 
   //animate
   const animate = () => {

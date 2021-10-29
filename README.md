@@ -2,5 +2,6 @@ React
 Redux
 Three.js
 
-Maze app
+Recursive backtracking
 
+Maze app

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
-import setScene from "./CanvasLib/setScene";
+import setScene from "./SceneLib/setScene";
 
 const Canvas = () => {
   const canvasRef = useRef();

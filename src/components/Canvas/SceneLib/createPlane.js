@@ -3,7 +3,7 @@ import { PlaneGeometry, MeshStandardMaterial, DoubleSide, Mesh } from "three";
 //Plane
 const createPlane = () => {
   const plane = new Mesh(
-    new PlaneGeometry(1000, 1000, 2, 2),
+    new PlaneGeometry(1500, 1500, 2, 2),
     new MeshStandardMaterial({
       color: "#ffe0b3",
       // transparent: true,
