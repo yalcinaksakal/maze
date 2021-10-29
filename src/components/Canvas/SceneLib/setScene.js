@@ -75,9 +75,11 @@ const setScene = (appenderFunc, dispatch, actions) => {
   // console.log(createPath(pathLines, visitor));
   //animate--------------------
   let line;
+  let check = false;
   const animate = () => {
     renderer.render(scene, camera);
-    if (maze.canContinue) {
+    check = !check;
+    if (maze.canContinue && check) {
       line = maze.nodeTraveller();
       if (line) pathLines.add(line);
     }

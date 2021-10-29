@@ -2,6 +2,8 @@ import { BufferGeometry, Line, LineBasicMaterial, Vector3 } from "three";
 
 const material = new LineBasicMaterial({
   color: "dodgerblue",
+  transparent: true,
+  opacity: 0.2,
 });
 
 class MazeGenerator {
