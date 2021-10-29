@@ -31,14 +31,14 @@ export const createWalls = () => {
     for (let j = 0; j < 41; j++) {
       if (i < 40) {
         const wallH = new Mesh(boxGeometryHorizantal, boxMaterial);
-        wallH.position.set(-487 + i * 25, 2.51, -500 + j * 25);
+        wallH.position.set(-487 + i * 25, 2.55, -500 + j * 25);
         wallH.castShadow = true;
         wallH.receiveShadow = true;
         walls.add(wallH);
       }
       if (j > 39) continue;
       const wallV = new Mesh(boxGeometryVertical, boxMaterial);
-      wallV.position.set(-500 + i * 25, 2.51, -487 + j * 25);
+      wallV.position.set(-500 + i * 25, 2.55, -487 + j * 25);
       wallV.castShadow = true;
       wallV.receiveShadow = true;
       walls.add(wallV);

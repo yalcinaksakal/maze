@@ -1,13 +1,19 @@
 import {
   // BoxBufferGeometry,
   Color,
+  CylinderBufferGeometry,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
   // Mesh,
   // MeshBasicMaterial,
   Scene,
 } from "three";
+import MazeGenerator from "../MazeLib/mazeGenerator";
+// import createPath from "../MazeLib/createPath";
 
 import myCam from "./camera";
-import createNodes, { createWalls } from "./createNodes";
+// import createNodes, { createWalls } from "./createNodes";
 import createPlane from "./createPlane";
 
 import createLights from "./lights";
@@ -47,12 +53,34 @@ const setScene = (appenderFunc, dispatch, actions) => {
   scene.add(createPlane());
 
   //nodes and walls
-  scene.add(createNodes());
-  scene.add(createWalls());
+  // scene.add(createNodes());
+  // scene.add(createWalls());
 
-  //animate
+  //Mazegeneration-------------
+  //lines
+  const pathLines = new Group();
+  scene.add(pathLines);
+  //visitor
+  const geometry = new CylinderBufferGeometry(5, 5, 2, 64);
+  const material = new MeshBasicMaterial({
+    color: "red",
+    // transparent: true,
+    // opacity: 0.8,
+  });
+  const visitor = new Mesh(geometry, material);
+  visitor.position.set(-487, 10, -487);
+  visitor.castShadow = true;
+  scene.add(visitor);
+  const maze = new MazeGenerator(visitor);
+  // console.log(createPath(pathLines, visitor));
+  //animate--------------------
+  let line;
   const animate = () => {
     renderer.render(scene, camera);
+    if (maze.canContinue) {
+      line = maze.nodeTraveller();
+      if (line) pathLines.add(line);
+    }
     controls.update();
   };
 
