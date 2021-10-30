@@ -13,7 +13,8 @@ import MazeGenerator from "../MazeLib/mazeGenerator";
 // import createPath from "../MazeLib/createPath";
 
 import myCam from "./camera";
-// import createNodes, { createWalls } from "./createNodes";
+
+// import createNodes, { createWalls } from "./createNodesAndWalls";
 import createPlane from "./createPlane";
 
 import createLights from "./lights";
@@ -75,14 +76,24 @@ const setScene = (appenderFunc, dispatch, actions) => {
   // console.log(createPath(pathLines, visitor));
   //animate--------------------
   let line;
-  let check = false;
+  let walls = null;
+  let height = 16;
   const animate = () => {
-    renderer.render(scene, camera);
-    check = !check;
-    if (maze.canContinue && check) {
+    if (maze.canContinue) {
       line = maze.nodeTraveller();
       if (line) pathLines.add(line);
+    } else if (!walls) {
+      walls = maze.getWalls();
+      scene.add(walls);
+      scene.remove(visitor);
+      scene.remove(pathLines);
+      height = 1;
     }
+    if (height < 16) {
+      height += 0.1;
+      walls.position.y += 0.1;
+    }
+    renderer.render(scene, camera);
     controls.update();
   };
 

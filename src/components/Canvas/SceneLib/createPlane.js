@@ -5,7 +5,7 @@ const createPlane = () => {
   const plane = new Mesh(
     new PlaneGeometry(1500, 1500, 2, 2),
     new MeshStandardMaterial({
-      color: "#ffe0b3",
+      color: "beige",
       // transparent: true,
       // opacity: 0.3,
     })
