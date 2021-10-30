@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import loadingReducer from "./loading-slice";
+import buttonReducer from "./button-slice";
 
 const store = configureStore({
   reducer: {
-    loading: loadingReducer,
+    buttonFuncs: buttonReducer,
   },
 });
 

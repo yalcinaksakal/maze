@@ -9,6 +9,8 @@ import {
   // MeshBasicMaterial,
   Scene,
 } from "three";
+import buttonActions from "../MazeLib/buttonActions";
+
 import MazeGenerator from "../MazeLib/mazeGenerator";
 // import createPath from "../MazeLib/createPath";
 
@@ -22,7 +24,7 @@ import createLights from "./lights";
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
 
-const setScene = (appenderFunc, dispatch, actions) => {
+const setScene = () => {
   //renderer
   const renderer = createR();
   //camera
@@ -58,9 +60,7 @@ const setScene = (appenderFunc, dispatch, actions) => {
   // scene.add(createWalls());
 
   //Mazegeneration-------------
-  //lines
-  const pathLines = new Group();
-  scene.add(pathLines);
+  let line, walls, height, pathLines, visitor, maze, canAnimate;
   //visitor
   const geometry = new CylinderBufferGeometry(5, 5, 2, 64);
   const material = new MeshBasicMaterial({
@@ -68,31 +68,63 @@ const setScene = (appenderFunc, dispatch, actions) => {
     // transparent: true,
     // opacity: 0.8,
   });
-  const visitor = new Mesh(geometry, material);
-  visitor.position.set(-487, 10, -487);
-  visitor.castShadow = true;
-  scene.add(visitor);
-  const maze = new MazeGenerator(visitor);
-  // console.log(createPath(pathLines, visitor));
-  //animate--------------------
-  let line;
-  let walls = null;
-  let height = 16;
-  const animate = () => {
+  const initialMazeSetup = () => {
+    canAnimate = false;
+    scene.remove(walls);
+    walls = null;
+    height = 16;
+    //lines
+    scene.remove(pathLines);
+    pathLines = new Group();
+    scene.add(pathLines);
+
+    //visitor
+    scene.remove(visitor);
+    visitor = new Mesh(geometry, material);
+    visitor.position.set(-487, 10, -487);
+    visitor.castShadow = true;
+    scene.add(visitor);
+    maze = new MazeGenerator(visitor);
+  };
+
+  const processMaze = () => {
     if (maze.canContinue) {
       line = maze.nodeTraveller();
       if (line) pathLines.add(line);
     } else if (!walls) {
       walls = maze.getWalls();
       scene.add(walls);
-      scene.remove(visitor);
-      scene.remove(pathLines);
-      height = 1;
+
+      height = buttonActions.type === "instant" ? 15.9 : 1;
     }
     if (height < 16) {
       height += 0.1;
-      walls.position.y += 0.1;
+      walls.position.y = height;
+      if (height >= 15.0) {
+        scene.remove(visitor);
+        scene.remove(pathLines);
+      }
     }
+  };
+
+  const instantMaze = () => {
+    initialMazeSetup();
+    while (maze.canContinue) processMaze();
+    canAnimate = true;
+  };
+  const simulateMaze = () => {
+    initialMazeSetup();
+    canAnimate = true;
+  };
+
+  //animate--------------------
+
+  const animate = () => {
+    if (buttonActions.pressed) {
+      buttonActions.pressed = false;
+      buttonActions.type === "instant" ? instantMaze() : simulateMaze();
+    }
+    if (canAnimate) processMaze();
     renderer.render(scene, camera);
     controls.update();
   };
