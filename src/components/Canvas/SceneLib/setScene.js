@@ -10,6 +10,7 @@ import {
   Scene,
 } from "three";
 import buttonActions from "../MazeLib/buttonActions";
+import dijkstraAction from "../MazeLib/dijkstra";
 
 import MazeGenerator from "../MazeLib/mazeGenerator";
 // import createPath from "../MazeLib/createPath";
@@ -100,7 +101,9 @@ const setScene = () => {
     if (height < 16) {
       height += 0.1;
       walls.position.y = height;
-      if (height >= 15.0) {
+      if (height >= 15.9) {
+        canAnimate = false;
+        dijkstraAction(maze.pathMap);
         scene.remove(visitor);
         scene.remove(pathLines);
       }
