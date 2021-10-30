@@ -65,7 +65,7 @@ function shortestPath(x, y) {
 export default function dijkstraAction(pathLines, sizeX, sizeY) {
   // for (let i = 0; i < 40; i++) {
   dijkstraInit(0, 0, pathLines);
-  // addPossibleCrossPathes(pathLines, sizeX, sizeY)
+  addPossibleCrossPathes(pathLines, sizeX, sizeY);
   shortestPath(0, 0);
   // console.log(pathes);
   // console.log(dijkstra);

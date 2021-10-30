@@ -27,7 +27,7 @@ import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
 
 const setScene = () => {
-  // let paths;
+  let paths;
   //renderer
   const renderer = createR();
   //camera
@@ -74,7 +74,7 @@ const setScene = () => {
   const initialMazeSetup = () => {
     canAnimate = false;
     scene.remove(walls);
-    // scene.remove(paths);
+    scene.remove(paths);
     walls = null;
     height = 16;
     //lines
@@ -107,8 +107,8 @@ const setScene = () => {
       if (height >= 15.9) {
         canAnimate = false;
         dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
-        // paths = drawer(maze.pathMap);
-        // scene.add(paths);
+        paths = drawer(maze.pathMap);
+        scene.add(paths);
         scene.remove(visitor);
         scene.remove(pathLines);
       }
