@@ -29,7 +29,7 @@ class MazeGenerator {
   pathMap = {};
   stack = [];
   canContinue = true;
-  constructor(visitor, mazeSizeX = 40, mazeSizeY = 40, startX = 0, startY = 0) {
+  constructor(visitor, mazeSizeX = 10, mazeSizeY = 10, startX = 0, startY = 0) {
     this.visitor = visitor;
     this.mazeSizeX = mazeSizeX;
     this.mazeSizeY = mazeSizeY;
@@ -66,9 +66,10 @@ class MazeGenerator {
     for (let i = -1; i < this.mazeSizeX; i++)
       for (let j = 0; j < this.mazeSizeY; j++) {
         //down wall
-        if (!doesPathExist(i, j, i, j - 1) && i > 0 && j > 0) {
-          //open some more possibilites
+        if (!doesPathExist(i, j, i, j - 1) && i > -1 && j > 0) {
+          // open some more possibilites
           if (Math.random() > 0.6) {
+            // console.log(`${i}-${j}:${i}-${j - 1}`);
             this.pathMap[`${i}-${j}:${i}-${j - 1}`] = 1;
           } else {
             wall = new Mesh(boxGeometryHorizantal, boxMaterial);
@@ -81,6 +82,7 @@ class MazeGenerator {
         //right wall
         if (!doesPathExist(i, j, i + 1, j)) {
           if (Math.random() > 0.7 && i > 0 && i < this.mazeSizeX - 1) {
+            // console.log(`${i}-${j}:${i + 1}-${j}`);
             this.pathMap[`${i}-${j}:${i + 1}-${j}`] = 1;
           } else {
             wall = new Mesh(boxGeometryVertical, boxMaterial);
