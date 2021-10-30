@@ -103,7 +103,7 @@ const setScene = () => {
       walls.position.y = height;
       if (height >= 15.9) {
         canAnimate = false;
-        dijkstraAction(maze.pathMap);
+        dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
         scene.remove(visitor);
         scene.remove(pathLines);
       }
