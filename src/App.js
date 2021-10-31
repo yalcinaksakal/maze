@@ -11,7 +11,7 @@ function App() {
   };
   return (
     <div className={styles.home}>
-      <button onClick={() => clicked("instant")}>Instant Maze</button>
+      <button onClick={() => clicked("instant")}>Create Maze</button>
       <button style={{ top: "35px" }} onClick={() => clicked("simulate")}>
         Simulate Maze
       </button>

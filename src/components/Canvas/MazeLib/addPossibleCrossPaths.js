@@ -36,12 +36,10 @@ const addPossibleCrossPathes = (pathes, mazeSizeX, mazeSizeY) => {
         pathes[`${i - 1}-${j + 1}:${i - 1}-${j}`];
 
       upLeft =
-        (isUpPossible && isFromUpToUpLeft) ||
-        (isLeftPossible && isFromLeftToUp);
+        isUpPossible && isFromUpToUpLeft && isLeftPossible && isFromLeftToUp;
 
       upRight =
-        (isUpPossible && isFromUpToUpright) ||
-        (isRightPossible && isFromRightToUp);
+        isUpPossible && isFromUpToUpright && isRightPossible && isFromRightToUp;
 
       if (upLeft) pathes[`${i}-${j}:${i + 1}-${j + 1}`] = 1.4;
       if (upRight) pathes[`${i}-${j}:${i - 1}-${j + 1}`] = 1.4;

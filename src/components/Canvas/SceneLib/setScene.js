@@ -11,6 +11,7 @@ import {
 } from "three";
 import buttonActions from "../MazeLib/buttonActions";
 import dijkstraAction from "../MazeLib/dijkstra";
+import dDrawer from "../MazeLib/dijkstraDrawer";
 
 import MazeGenerator from "../MazeLib/mazeGenerator";
 // import createPath from "../MazeLib/createPath";
@@ -21,13 +22,14 @@ import myCam from "./camera";
 import createPlane from "./createPlane";
 
 import createLights from "./lights";
-import drawer from "./pathDrawer";
+// import drawer from "./pathDrawer";
 
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
 
 const setScene = () => {
-  let paths;
+  // let paths;
+  let dpaths;
   //renderer
   const renderer = createR();
   //camera
@@ -74,11 +76,12 @@ const setScene = () => {
   const initialMazeSetup = () => {
     canAnimate = false;
     scene.remove(walls);
-    scene.remove(paths);
+    // scene.remove(paths);
     walls = null;
     height = 16;
     //lines
     scene.remove(pathLines);
+    scene.remove(dpaths);
     pathLines = new Group();
     scene.add(pathLines);
 
@@ -99,6 +102,11 @@ const setScene = () => {
       walls = maze.getWalls();
       scene.add(walls);
 
+      dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY).then(p => {
+        dpaths = dDrawer(p);
+        scene.add(dpaths);
+      });
+
       height = buttonActions.type === "instant" ? 15.9 : 1;
     }
     if (height < 16) {
@@ -106,18 +114,22 @@ const setScene = () => {
       walls.position.y = height;
       if (height >= 15.9) {
         canAnimate = false;
-        dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
-        paths = drawer(maze.pathMap);
-        scene.add(paths);
+
+        // addPaths();
         scene.remove(visitor);
         scene.remove(pathLines);
       }
     }
   };
 
+  // const addPaths = () => {
+  //   paths = drawer(maze.pathMap);
+  //   scene.add(paths);
+  // };
   const instantMaze = () => {
     initialMazeSetup();
     while (maze.canContinue) processMaze();
+
     canAnimate = true;
   };
   const simulateMaze = () => {

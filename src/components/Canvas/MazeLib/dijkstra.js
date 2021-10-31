@@ -4,7 +4,6 @@ let dijkstra, visitedNodes, previousNode, pathes;
 //dijkstra: shortest distance from starting node
 function dijkstraInit(x, y, pathLines) {
   pathes = pathLines;
-
   dijkstra = {};
   visitedNodes = {};
   previousNode = {};
@@ -62,15 +61,45 @@ function shortestPath(x, y) {
   }
 }
 
-export default function dijkstraAction(pathLines, sizeX, sizeY) {
-  // for (let i = 0; i < 40; i++) {
-  dijkstraInit(0, 0, pathLines);
-  addPossibleCrossPathes(pathLines, sizeX, sizeY);
-  shortestPath(0, 0);
-  // console.log(pathes);
-  // console.log(dijkstra);
-  // console.log(previousNode);
-  // }
+export default async function dijkstraAction(pathLines, sizeX, sizeY) {
+  const pathes = {};
+  for (let start = 0; start < sizeX; start++) {
+    let min = null,
+      exit,
+      current;
+    let path = [];
 
-  return { shortestDistanceToNodes: dijkstra, path: previousNode };
+    dijkstraInit(start, 0, pathLines);
+    addPossibleCrossPathes(pathLines, sizeX, sizeY);
+    shortestPath(start, 0);
+
+    //find shortest path to get out the maze
+    for (let i = 0; i < sizeX - 1; i++) {
+      current = dijkstra[`${i}-${sizeY - 1}`];
+      if (!current) continue;
+      if (!min || min > current) {
+        exit = i;
+        min = current;
+      }
+    }
+    //if no path
+    if (min === null) continue;
+    //crete path from previousnodes
+    let x = exit,
+      temp,
+      y = sizeY - 1;
+
+    path.unshift({ x: exit, y: sizeY });
+    path.unshift({ x: exit, y: sizeY - 1 });
+    while (x !== start || y !== 0) {
+      temp = previousNode[`${x}-${y}`];
+      x = temp.x;
+      y = temp.y;
+      path.unshift({ x, y });
+    }
+    path.unshift({ x, y: -1 });
+
+    pathes[start] = { path: [...path] };
+  }
+  return pathes;
 }

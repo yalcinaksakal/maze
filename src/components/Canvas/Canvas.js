@@ -6,6 +6,7 @@ const Canvas = () => {
   const canvasRef = useRef();
 
   useEffect(() => {
+    // console.log("canvas");
     const appender = () => canvasRef.current.appendChild(domElement);
     const { domElement, onResize, animate, keyDownHandler, keyUpHandler } =
       setScene();
