@@ -19,6 +19,9 @@ const status = createSlice({
       state.done++;
       if (state.done > state.total - 1) state.calculating = false;
     },
+    stop(state) {
+      state.calculating = false;
+    },
   },
 });
 

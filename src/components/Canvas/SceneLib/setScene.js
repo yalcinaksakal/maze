@@ -97,6 +97,8 @@ const setScene = statusFunc => {
     scene.remove(dijkstraPaths);
     dijkstraPaths = new Group();
     scene.add(dijkstraPaths);
+
+    statusFunc(statusActions.stop());
   };
 
   const processMaze = () => {
@@ -123,7 +125,7 @@ const setScene = statusFunc => {
 
       dijkstraWorker.onmessage = e => {
         statusFunc(statusActions.addDone());
-        e.data !== "null" && dijkstraPaths.add(dDrawer(JSON.parse(e.data)));
+        e.data !== "null" && dijkstraPaths.add(...dDrawer(JSON.parse(e.data)));
       };
       // -------
       height = buttonActions.type === "instant" ? 15.9 : 0.1;
@@ -137,10 +139,6 @@ const setScene = statusFunc => {
     }
   };
 
-  // const addPaths = () => {
-  //   paths = drawer(maze.pathMap);
-  //   scene.add(paths);
-  // };
   const instantMaze = () => {
     initialMazeSetup();
     while (maze.canContinue) processMaze();

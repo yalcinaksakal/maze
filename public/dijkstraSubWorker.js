@@ -85,7 +85,7 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
     temp,
     y = outY;
 
-  path.unshift({ x: exit, y: starty ? -1 : sizeY });
+  path.unshift({ x: exit, y: starty ? -5 : sizeY + 4 });
   path.unshift({ x: exit, y });
 
   while (x !== startx || y !== starty) {
@@ -95,6 +95,7 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
     path.unshift({ x, y });
   }
   path.unshift({ x, y: starty ? sizeY : -1 });
+
   return { path, direction: starty ? "down" : "up" };
 }
 
