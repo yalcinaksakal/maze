@@ -1,16 +1,18 @@
 import { useEffect, useRef } from "react";
+import { useDispatch } from "react-redux";
 
 import setScene from "./SceneLib/setScene";
 
 const Canvas = () => {
   const canvasRef = useRef();
+  const dispatch = useDispatch();
 
   useEffect(() => {
     // console.log("canvas");
-    const appender = () => canvasRef.current.appendChild(domElement);
+
     const { domElement, onResize, animate, keyDownHandler, keyUpHandler } =
-      setScene();
-    appender();
+      setScene(dispatch);
+    canvasRef.current.appendChild(domElement);
     let frameId;
 
     const RAF = () => {
@@ -33,7 +35,7 @@ const Canvas = () => {
       window.removeEventListener("keyup", keyUpHandler);
       domElement.remove();
     };
-  }, []);
+  }, [dispatch]);
 
   return (
     <div

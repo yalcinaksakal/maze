@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import buttonReducer from "./button-slice";
+import statusReducer from "./status";
 
 const store = configureStore({
   reducer: {
-    buttonFuncs: buttonReducer,
+    status: statusReducer,
   },
 });
 

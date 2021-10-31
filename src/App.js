@@ -3,6 +3,7 @@ import Canvas from "./components/Canvas/Canvas";
 import styles from "./App.module.scss";
 import buttonActions from "./components/Canvas/MazeLib/buttonActions";
 import Paragraph from "./components/Paragraph/Paragraph";
+import Status from "./components/Status/Status";
 
 function App() {
   const clicked = type => {
@@ -17,6 +18,7 @@ function App() {
       </button>
       <Paragraph />
       <Canvas />
+      <Status />
     </div>
   );
 }

@@ -9,6 +9,7 @@ import {
   // MeshBasicMaterial,
   Scene,
 } from "three";
+import { statusActions } from "../../../store/status";
 import addPossibleCrossPathes from "../MazeLib/addPossibleCrossPaths";
 
 import buttonActions from "../MazeLib/buttonActions";
@@ -32,7 +33,7 @@ import setOrbitControls from "./setOrbitControls";
 
 let dijkstraWorker;
 
-const setScene = () => {
+const setScene = statusFunc => {
   // let paths;
   let dijkstraPaths;
   //renderer
@@ -105,20 +106,26 @@ const setScene = () => {
     } else if (!walls) {
       walls = maze.getWalls();
       scene.add(walls);
-      addPossibleCrossPathes(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
+      scene.remove(visitor);
+      scene.remove(pathLines);
 
+      addPossibleCrossPathes(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
+      //starting workers
+      statusFunc(
+        statusActions.setCalculating({
+          total: 2 * maze.mazeSizeX,
+          calculating: true,
+        })
+      );
       dijkstraWorker.postMessage(
         JSON.stringify([maze.pathMap, maze.mazeSizeX, maze.mazeSizeY])
       );
 
       dijkstraWorker.onmessage = e => {
+        statusFunc(statusActions.addDone());
         e.data !== "null" && dijkstraPaths.add(dDrawer(JSON.parse(e.data)));
       };
-      // dijkstraPaths = dDrawer(
-      //   dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY)
-      // );
-      // scene.add(dijkstraPaths);
-
+      // -------
       height = buttonActions.type === "instant" ? 15.9 : 0.1;
     }
     if (height < 16) {
@@ -126,10 +133,6 @@ const setScene = () => {
       walls.position.y = height;
       if (height >= 15.9) {
         canAnimate = false;
-
-        // addPaths();
-        scene.remove(visitor);
-        scene.remove(pathLines);
       }
     }
   };

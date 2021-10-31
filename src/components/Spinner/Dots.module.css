@@ -1,0 +1,29 @@
+.spinner {
+  display: inline-block;
+}
+.spinner > div {
+  width: 4px;
+  height: 4px;
+  margin: 0 2px;
+  background-color: rgb(10, 106, 100);
+  border-radius: 100%;
+  display: inline-block;
+  animation: bouncedelay 1.3s infinite ease-in-out;
+  animation-fill-mode: both;
+}
+.spinner div:first-child {
+  animation-delay: -0.32s;
+}
+.spinner div:nth-child(2) {
+  animation-delay: -0.16s;
+}
+@keyframes bouncedelay {
+  0%,
+  80%,
+  100% {
+    opacity: 0.1;
+  }
+  40% {
+    opacity: 1;
+  }
+}
