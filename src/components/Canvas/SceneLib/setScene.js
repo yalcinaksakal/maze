@@ -12,7 +12,7 @@ import {
 import addPossibleCrossPathes from "../MazeLib/addPossibleCrossPaths";
 
 import buttonActions from "../MazeLib/buttonActions";
-import dijkstraAction from "../MazeLib/dijkstra";
+// import dijkstraAction from "../MazeLib/dijkstra";
 import dDrawer from "../MazeLib/dijkstraDrawer";
 
 import MazeGenerator from "../MazeLib/mazeGenerator";
@@ -30,11 +30,11 @@ import createLights from "./lights";
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
 
-let dijkstraWorker = new Worker("./dijkstraWorker.js");
+let dijkstraWorker;
 
 const setScene = () => {
   // let paths;
-  let dpaths;
+  let dijkstraPaths;
   //renderer
   const renderer = createR();
   //camera
@@ -77,7 +77,6 @@ const setScene = () => {
     height = 16;
     //lines
     scene.remove(pathLines);
-    scene.remove(dpaths);
     pathLines = new Group();
     scene.add(pathLines);
 
@@ -90,8 +89,13 @@ const setScene = () => {
     maze = new MazeGenerator(visitor);
 
     //worker
-    dijkstraWorker.terminate();
-    dijkstraWorker = new Worker("./dijkstraWorker.js");
+    dijkstraWorker?.terminate();
+    dijkstraWorker = new Worker("./dijkstraWorker2.js");
+
+    //dijkstraPaths
+    scene.remove(dijkstraPaths);
+    dijkstraPaths = new Group();
+    scene.add(dijkstraPaths);
   };
 
   const processMaze = () => {
@@ -107,12 +111,12 @@ const setScene = () => {
       );
       console.log("new worker");
       dijkstraWorker.onmessage = e => {
-        console.log(JSON.parse(e.data));
+        dijkstraPaths.add(dDrawer(JSON.parse(e.data)));
       };
-      // dpaths = dDrawer(
+      // dijkstraPaths = dDrawer(
       //   dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY)
       // );
-      // scene.add(dpaths);
+      // scene.add(dijkstraPaths);
 
       height = buttonActions.type === "instant" ? 15.9 : 0.1;
     }
