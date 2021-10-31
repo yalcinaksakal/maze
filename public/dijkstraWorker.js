@@ -59,44 +59,48 @@ function shortestPath(x, y) {
   }
 }
 
-export default function dijkstraAction(pathLines, sizeX, sizeY) {
-  const pathes = {};
-  for (let start = 0; start < sizeX; start++) {
-    let min = null,
-      exit,
-      current;
-    let path = [];
+function dijkstraAction(pathLines, start, sizeX, sizeY) {
+  let min = null,
+    exit,
+    current;
+  let path = [];
 
-    dijkstraInit(start, 0, pathLines);
-    shortestPath(start, 0);
+  dijkstraInit(start, 0, pathLines);
+  shortestPath(start, 0);
 
-    //find shortest path to get out the maze
-    for (let i = 0; i < sizeX - 1; i++) {
-      current = dijkstra[`${i}-${sizeY - 1}`];
-      if (!current) continue;
-      if (!min || min > current) {
-        exit = i;
-        min = current;
-      }
+  //find shortest path to get out the maze
+  for (let i = 0; i < sizeX - 1; i++) {
+    current = dijkstra[`${i}-${sizeY - 1}`];
+    if (!current) continue;
+    if (!min || min > current) {
+      exit = i;
+      min = current;
     }
-    //if no path
-    if (min === null) continue;
-    //crete path from previousnodes
-    let x = exit,
-      temp,
-      y = sizeY - 1;
-
-    path.unshift({ x: exit, y: sizeY });
-    path.unshift({ x: exit, y: sizeY - 1 });
-    while (x !== start || y !== 0) {
-      temp = previousNode[`${x}-${y}`];
-      x = temp.x;
-      y = temp.y;
-      path.unshift({ x, y });
-    }
-    path.unshift({ x, y: -1 });
-
-    pathes[start] = { path: [...path] };
   }
-  return pathes;
+  //if no path
+  if (min === null) return null;
+  //crete path from previousnodes
+  let x = exit,
+    temp,
+    y = sizeY - 1;
+
+  path.unshift({ x: exit, y: sizeY });
+  path.unshift({ x: exit, y: sizeY - 1 });
+  while (x !== start || y !== 0) {
+    temp = previousNode[`${x}-${y}`];
+    x = temp.x;
+    y = temp.y;
+    path.unshift({ x, y });
+  }
+  path.unshift({ x, y: -1 });
+  return path;
 }
+
+onmessage = function (e) {
+  const [pathes, x, y] = JSON.parse(e.data);
+  let path;
+  for (let start = 0; start < x; start++) {
+    path = dijkstraAction(pathes, start, x, y);
+    if (path) postMessage(JSON.stringify(path));
+  }
+};

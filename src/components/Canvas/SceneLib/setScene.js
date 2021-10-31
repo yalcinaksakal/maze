@@ -9,11 +9,14 @@ import {
   // MeshBasicMaterial,
   Scene,
 } from "three";
+import addPossibleCrossPathes from "../MazeLib/addPossibleCrossPaths";
+
 import buttonActions from "../MazeLib/buttonActions";
 import dijkstraAction from "../MazeLib/dijkstra";
 import dDrawer from "../MazeLib/dijkstraDrawer";
 
 import MazeGenerator from "../MazeLib/mazeGenerator";
+
 // import createPath from "../MazeLib/createPath";
 
 import myCam from "./camera";
@@ -26,6 +29,8 @@ import createLights from "./lights";
 
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
+
+let dijkstraWorker = new Worker("./dijkstraWorker.js");
 
 const setScene = () => {
   // let paths;
@@ -47,15 +52,6 @@ const setScene = () => {
 
   //add controls
   const controls = setOrbitControls(camera, domElement);
-
-  //cube
-
-  // const geometry = new BoxBufferGeometry(30, 200, 30);
-  // const material = new MeshBasicMaterial({ color: "gray" });
-  // const cube = new Mesh(geometry, material);
-  // cube.castShadow = true;
-  // cube.position.set(0, 101, 0);
-  // scene.add(cube);
 
   //plane
   scene.add(createPlane());
@@ -92,6 +88,10 @@ const setScene = () => {
     visitor.castShadow = true;
     scene.add(visitor);
     maze = new MazeGenerator(visitor);
+
+    //worker
+    dijkstraWorker.terminate();
+    dijkstraWorker = new Worker("./dijkstraWorker.js");
   };
 
   const processMaze = () => {
@@ -101,13 +101,20 @@ const setScene = () => {
     } else if (!walls) {
       walls = maze.getWalls();
       scene.add(walls);
+      addPossibleCrossPathes(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
+      dijkstraWorker.postMessage(
+        JSON.stringify([maze.pathMap, maze.mazeSizeX, maze.mazeSizeY])
+      );
+      console.log("new worker");
+      dijkstraWorker.onmessage = e => {
+        console.log(JSON.parse(e.data));
+      };
+      // dpaths = dDrawer(
+      //   dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY)
+      // );
+      // scene.add(dpaths);
 
-      dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY).then(p => {
-        dpaths = dDrawer(p);
-        scene.add(dpaths);
-      });
-
-      height = buttonActions.type === "instant" ? 15.9 : 1;
+      height = buttonActions.type === "instant" ? 15.9 : 0.1;
     }
     if (height < 16) {
       height += 0.1;
@@ -129,7 +136,6 @@ const setScene = () => {
   const instantMaze = () => {
     initialMazeSetup();
     while (maze.canContinue) processMaze();
-
     canAnimate = true;
   };
   const simulateMaze = () => {
