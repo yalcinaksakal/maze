@@ -90,7 +90,7 @@ const setScene = () => {
 
     //worker
     dijkstraWorker?.terminate();
-    dijkstraWorker = new Worker("./dijkstraWorker2.js");
+    dijkstraWorker = new Worker("./dijkstraWorker.js");
 
     //dijkstraPaths
     scene.remove(dijkstraPaths);
@@ -106,12 +106,13 @@ const setScene = () => {
       walls = maze.getWalls();
       scene.add(walls);
       addPossibleCrossPathes(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
+
       dijkstraWorker.postMessage(
         JSON.stringify([maze.pathMap, maze.mazeSizeX, maze.mazeSizeY])
       );
-      console.log("new worker");
+
       dijkstraWorker.onmessage = e => {
-        dijkstraPaths.add(dDrawer(JSON.parse(e.data)));
+        e.data !== "null" && dijkstraPaths.add(dDrawer(JSON.parse(e.data)));
       };
       // dijkstraPaths = dDrawer(
       //   dijkstraAction(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY)

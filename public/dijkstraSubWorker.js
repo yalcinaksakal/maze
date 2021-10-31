@@ -59,18 +59,19 @@ function shortestPath(x, y) {
   }
 }
 
-function dijkstraAction(pathLines, start, sizeX, sizeY) {
+function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
   let min = null,
     exit,
     current;
   let path = [];
 
-  dijkstraInit(start, 0, pathLines);
-  shortestPath(start, 0);
+  dijkstraInit(startx, starty, pathLines);
+  shortestPath(startx, starty);
 
   //find shortest path to get out the maze
+  const outY = starty ? 0 : sizeY - 1;
   for (let i = 0; i < sizeX - 1; i++) {
-    current = dijkstra[`${i}-${sizeY - 1}`];
+    current = dijkstra[`${i}-${outY}`];
     if (!current) continue;
     if (!min || min > current) {
       exit = i;
@@ -82,22 +83,23 @@ function dijkstraAction(pathLines, start, sizeX, sizeY) {
   //crete path from previousnodes
   let x = exit,
     temp,
-    y = sizeY - 1;
+    y = outY;
 
-  path.unshift({ x: exit, y: sizeY });
-  path.unshift({ x: exit, y: sizeY - 1 });
-  while (x !== start || y !== 0) {
+  path.unshift({ x: exit, y: starty ? -1 : sizeY });
+  path.unshift({ x: exit, y });
+
+  while (x !== startx || y !== starty) {
     temp = previousNode[`${x}-${y}`];
     x = temp.x;
     y = temp.y;
     path.unshift({ x, y });
   }
-  path.unshift({ x, y: -1 });
-  return path;
+  path.unshift({ x, y: starty ? sizeY : -1 });
+  return { path, direction: starty ? "down" : "up" };
 }
 
 onmessage = function (e) {
-  const [pathes, x, y, start] = e.data;
-  const path = dijkstraAction(pathes, start, x, y);
-  if (path) postMessage(JSON.stringify(path));
+  const [pathes, x, y, startx, starty] = e.data;
+  const result = dijkstraAction(pathes, startx, starty, x, y);
+  postMessage(result ? JSON.stringify(result) : "null");
 };
