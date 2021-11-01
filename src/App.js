@@ -4,6 +4,7 @@ import styles from "./App.module.scss";
 import buttonActions from "./components/Canvas/MazeLib/buttonActions";
 import Paragraph from "./components/Paragraph/Paragraph";
 import Status from "./components/Status/Status";
+import RangeBar from "./components/RangeBar/RangeBar";
 
 function App() {
   const clicked = type => {
@@ -22,6 +23,8 @@ function App() {
       <Paragraph />
       <Canvas />
       <Status />
+      <RangeBar type={"complexity"} />
+      <RangeBar type={"speed"} />
     </div>
   );
 }

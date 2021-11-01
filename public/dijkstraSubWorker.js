@@ -70,7 +70,7 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
 
   //find shortest path to get out the maze
   const outY = starty ? 0 : sizeY - 1;
-  for (let i = 0; i < sizeX - 1; i++) {
+  for (let i = 0; i < sizeX; i++) {
     current = dijkstra[`${i}-${outY}`];
     if (!current) continue;
     if (!min || min > current) {
@@ -95,7 +95,6 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
     path.unshift({ x, y });
   }
   path.unshift({ x, y: starty ? sizeY : -1 });
-
   return { path, direction: starty ? "down" : "up" };
 }
 

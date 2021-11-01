@@ -8,6 +8,7 @@ import {
   MeshBasicMaterial,
   Vector3,
 } from "three";
+import { complexity } from "./buttonActions";
 
 const material = new LineBasicMaterial({
   color: "dodgerblue",
@@ -29,20 +30,13 @@ class MazeGenerator {
   pathMap = {};
   stack = [];
   canContinue = true;
-  constructor(
-    visitor,
-    mazeSizeX = 40,
-    mazeSizeY = 40,
-    startX = 0,
-    startY = 0,
-    mazeComplexity = 0.7
-  ) {
+  constructor(visitor, mazeSizeX = 40, mazeSizeY = 40, startX = 0, startY = 0) {
     this.visitor = visitor;
     this.mazeSizeX = mazeSizeX;
     this.mazeSizeY = mazeSizeY;
     this.X = startX ? startX : this.pickRandomly(mazeSizeX);
     this.Y = startY;
-    this.mazeComplexity = mazeComplexity;
+    this.mazeComplexity = complexity;
   }
 
   isNodeValid = (x, y) =>
@@ -76,7 +70,7 @@ class MazeGenerator {
         //down wall
         if (!doesPathExist(i, j, i, j - 1) && i > -1 && j > 0) {
           // open some more possibilites
-          if (Math.random() > this.mazeComplexity) {
+          if (Math.random() > this.mazeComplexity.c) {
             // console.log(`${i}-${j}:${i}-${j - 1}`);
             this.pathMap[`${i}-${j}:${i}-${j - 1}`] = 1;
           } else {
@@ -90,8 +84,8 @@ class MazeGenerator {
         //right wall
         if (!doesPathExist(i, j, i + 1, j)) {
           if (
-            Math.random() > this.mazeComplexity &&
-            i > 0 &&
+            Math.random() > this.mazeComplexity.c &&
+            i > -1 &&
             i < this.mazeSizeX - 1
           ) {
             // console.log(`${i}-${j}:${i + 1}-${j}`);

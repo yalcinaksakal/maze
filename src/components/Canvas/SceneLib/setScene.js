@@ -12,7 +12,7 @@ import {
 import { statusActions } from "../../../store/status";
 import addPossibleCrossPathes from "../MazeLib/addPossibleCrossPaths";
 
-import buttonActions from "../MazeLib/buttonActions";
+import buttonActions, { complexity } from "../MazeLib/buttonActions";
 // import dijkstraAction from "../MazeLib/dijkstra";
 import dDrawer from "../MazeLib/dijkstraDrawer";
 
@@ -103,8 +103,10 @@ const setScene = statusFunc => {
 
   const processMaze = () => {
     if (maze.canContinue) {
-      line = maze.nodeTraveller();
-      if (line) pathLines.add(line);
+      for (let i = 0; i < complexity.speed; i++) {
+        line = maze.nodeTraveller();
+        if (line) pathLines.add(line);
+      }
     } else if (!walls) {
       walls = maze.getWalls();
       scene.add(walls);
@@ -150,6 +152,7 @@ const setScene = statusFunc => {
   };
 
   const toggleLines = () => {
+    if (!dijkstraPaths) return;
     dijkstraPaths.parent === scene
       ? scene.remove(dijkstraPaths)
       : scene.add(dijkstraPaths);
