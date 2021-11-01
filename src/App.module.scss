@@ -8,15 +8,16 @@
     width: 110px;
     position: absolute;
     display: block;
-    padding: 5px 10px;
-    margin: 15px 10px;
+    padding: 10px;
+    margin: 0;
     background: rgb(10, 106, 100);
     border: none;
-    border-radius: 5px;
+    // border-radius: 5px;
     transition: all ease 0.2s;
     cursor: pointer;
     color: white;
     opacity: 0.7;
+    text-align: left;
     &:hover {
       opacity: 1;
     }

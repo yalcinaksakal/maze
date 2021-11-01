@@ -14,16 +14,12 @@ const dDrawer = data => {
   const shift = direction === "up" ? -2 : 2;
 
   const rndm = () => Math.floor(Math.random() * 256);
-  const color = `rgb(0,${direction === "up" ? "255" : rndm()},${
+  const color = `rgb(${direction === "up" ? "255" : rndm()},0,${
     direction === "up" ? rndm() : "255"
   })`;
   for (const point of path)
     points.push(
-      new Vector3(
-        -487 + point.x * 25 + shift,
-        15 + 2 * shift,
-        -487 + point.y * 25
-      )
+      new Vector3(-487 + point.x * 25 + shift, 15, -487 + point.y * 25)
     );
 
   const material = new LineBasicMaterial({

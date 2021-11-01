@@ -16,6 +16,9 @@ function App() {
       <button style={{ top: "35px" }} onClick={() => clicked("simulate")}>
         Simulate Maze
       </button>
+      <button style={{ top: "69px" }} onClick={() => clicked("toggle")}>
+        Toggle Lines
+      </button>
       <Paragraph />
       <Canvas />
       <Status />

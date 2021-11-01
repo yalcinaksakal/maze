@@ -3,7 +3,7 @@ onmessage = function (e) {
   subworkers.forEach(sw => sw.terminate());
   subworkers = [];
 
-  let swNo = 20; //I want max subworkers working at the same time
+  let swNo = 20; // max subworkers working at the same time
 
   const [pathes, sizeX, sizeY] = JSON.parse(e.data);
   const indexer = input => ({

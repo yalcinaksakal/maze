@@ -29,12 +29,20 @@ class MazeGenerator {
   pathMap = {};
   stack = [];
   canContinue = true;
-  constructor(visitor, mazeSizeX = 40, mazeSizeY = 40, startX = 0, startY = 0) {
+  constructor(
+    visitor,
+    mazeSizeX = 40,
+    mazeSizeY = 40,
+    startX = 0,
+    startY = 0,
+    mazeComplexity = 0.7
+  ) {
     this.visitor = visitor;
     this.mazeSizeX = mazeSizeX;
     this.mazeSizeY = mazeSizeY;
     this.X = startX ? startX : this.pickRandomly(mazeSizeX);
     this.Y = startY;
+    this.mazeComplexity = mazeComplexity;
   }
 
   isNodeValid = (x, y) =>
@@ -68,7 +76,7 @@ class MazeGenerator {
         //down wall
         if (!doesPathExist(i, j, i, j - 1) && i > -1 && j > 0) {
           // open some more possibilites
-          if (Math.random() > 0.7) {
+          if (Math.random() > this.mazeComplexity) {
             // console.log(`${i}-${j}:${i}-${j - 1}`);
             this.pathMap[`${i}-${j}:${i}-${j - 1}`] = 1;
           } else {
@@ -81,7 +89,11 @@ class MazeGenerator {
         }
         //right wall
         if (!doesPathExist(i, j, i + 1, j)) {
-          if (Math.random() > 0.5 && i > 0 && i < this.mazeSizeX - 1) {
+          if (
+            Math.random() > this.mazeComplexity &&
+            i > 0 &&
+            i < this.mazeSizeX - 1
+          ) {
             // console.log(`${i}-${j}:${i + 1}-${j}`);
             this.pathMap[`${i}-${j}:${i + 1}-${j}`] = 1;
           } else {

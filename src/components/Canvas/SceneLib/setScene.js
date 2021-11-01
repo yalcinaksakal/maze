@@ -149,12 +149,21 @@ const setScene = statusFunc => {
     canAnimate = true;
   };
 
+  const toggleLines = () => {
+    dijkstraPaths.parent === scene
+      ? scene.remove(dijkstraPaths)
+      : scene.add(dijkstraPaths);
+  };
   //animate--------------------
 
   const animate = () => {
     if (buttonActions.pressed) {
       buttonActions.pressed = false;
-      buttonActions.type === "instant" ? instantMaze() : simulateMaze();
+      buttonActions.type === "instant"
+        ? instantMaze()
+        : buttonActions.type === "simulate"
+        ? simulateMaze()
+        : toggleLines();
     }
     if (canAnimate) processMaze();
     renderer.render(scene, camera);
