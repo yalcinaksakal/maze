@@ -1,6 +1,8 @@
 import {
+  BoxBufferGeometry,
   BufferGeometry,
   ConeGeometry,
+  Group,
   Line,
   LineBasicMaterial,
   Mesh,
@@ -14,7 +16,7 @@ const dDrawer = data => {
   const shift = direction === "up" ? -2 : 2;
 
   const rndm = () => Math.floor(Math.random() * 256);
-  const color = `rgb(${direction === "up" ? "255" : rndm()},0,${
+  let color = `rgb(0,${direction === "up" ? "255" : rndm()},${
     direction === "up" ? rndm() : "255"
   })`;
   for (const point of path)
@@ -32,13 +34,33 @@ const dDrawer = data => {
   const line = new Line(geometry, material);
   line.castShadow = true;
 
-  const geometryArrow = new ConeGeometry(10, 20, 16);
-  geometryArrow.rotateX(((direction === "up" ? 1 : -1) * Math.PI) / 2);
-  const arrow = new Mesh(geometryArrow, new MeshBasicMaterial({ color }));
   const firstPoint = points[0];
-  arrow.position.set(firstPoint.x, firstPoint.y, firstPoint.z);
-  arrow.castShadow = true;
-  return [line, arrow];
+  let startFigure;
+
+  const createStartFigure = geometry => {
+    const result = new Mesh(geometry, new MeshBasicMaterial({ color }));
+
+    result.position.set(firstPoint.x, firstPoint.y, firstPoint.z);
+    result.castShadow = true;
+
+    return result;
+  };
+
+  if (points.length > 1) {
+    const geometryArrow = new ConeGeometry(10, 20, 16);
+    geometryArrow.rotateX(((direction === "up" ? 1 : -1) * Math.PI) / 2);
+    startFigure = createStartFigure(geometryArrow);
+  } else {
+    const geometryCross = new BoxBufferGeometry(2, 5, 20);
+    geometryCross.rotateY(Math.PI / 4);
+    color = "red";
+    startFigure = new Group();
+    startFigure.add(createStartFigure(geometryCross));
+    startFigure.add(
+      createStartFigure(geometryCross.clone().rotateY(-Math.PI / 2))
+    );
+  }
+  return [line, startFigure];
 };
 
 export default dDrawer;
