@@ -3,10 +3,10 @@ onmessage = function (e) {
   subworkers.forEach(sw => sw.terminate());
   subworkers = [];
 
-  let swNo = 40; // max subworkers working at the same time
-
   const [pathes, sizeX, sizeY] = JSON.parse(e.data);
   const indexer = input => [input % sizeX, input >= sizeX ? sizeY - 1 : 0];
+
+  let swNo = Math.min(50, sizeX); // max subworkers working at the same time
 
   const newSubWorker = (x, y) => {
     const subWorker = new Worker("./dijkstraSubWorker.js");

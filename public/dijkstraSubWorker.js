@@ -14,7 +14,6 @@ const setDijkstraSortedArray = (x, y, value, processType) => {
   let low = 0,
     mid = 0,
     high = unvisitedDijkstraSortedArray.length;
-
   while (low < high) {
     mid = (low + high) >>> 1;
     if (unvisitedDijkstraSortedArray[mid].value < value) low = mid + 1;
@@ -25,19 +24,18 @@ const setDijkstraSortedArray = (x, y, value, processType) => {
     let check = false,
       repeat = true;
     while (!check && repeat) {
-      repeat = unvisitedDijkstraSortedArray[mid]?.value === value;
+      repeat = unvisitedDijkstraSortedArray[low]?.value === value;
       check =
-        unvisitedDijkstraSortedArray[mid]?.x === x &&
-        unvisitedDijkstraSortedArray[mid]?.y === y &&
+        unvisitedDijkstraSortedArray[low]?.x === x &&
+        unvisitedDijkstraSortedArray[low]?.y === y &&
         repeat;
-
-      mid++;
+      low++;
     }
-    if (check) unvisitedDijkstraSortedArray.splice(mid - 1, 1);
+    if (check) unvisitedDijkstraSortedArray.splice(low - 1, 1);
     return;
   }
   //add
-  unvisitedDijkstraSortedArray.splice(mid, 0, { x, y, value });
+  unvisitedDijkstraSortedArray.splice(low, 0, { x, y, value });
 };
 
 function setNewDistance(x1, y1, x2, y2, newDistance) {
@@ -47,10 +45,9 @@ function setNewDistance(x1, y1, x2, y2, newDistance) {
   if (visitedNodes[`${x2}-${y2}`]) return;
   //if not visited, find old place and delete it from sorted arr
   setDijkstraSortedArray(x2, y2, newDistance, "delete");
-  //find ne position and add it to sorted arr
+  //find the correct position and add node to sorted arr
   setDijkstraSortedArray(x2, y2, newDistance, "add");
 }
-
 // 12-0:13-0  = 1  pathes from:to
 const isAccessable = (x1, y1, x2, y2) => {
   if (pathes[`${x1}-${y1}:${x2}-${y2}`])
@@ -62,7 +59,7 @@ const isAccessable = (x1, y1, x2, y2) => {
 
 function shortestPath(x, y) {
   //find all accessable neighbours
-  let isNeighbourAccesable, nodeToVisit, newDistance;
+  let isNeighbourAccesable, newDistance;
   for (let i = -1; i < 2; i++)
     for (let j = -1; j < 2; j++) {
       if (!i && !j) continue;
@@ -76,20 +73,27 @@ function shortestPath(x, y) {
       else if (dijkstra[`${x + i}-${y + j}`] > newDistance)
         setNewDistance(x, y, x + i, y + j, newDistance);
     }
-
-  //find which node to visit and visit it
-
-  //choose from accassable(dijkstra[id] is not null) nodes  which is unvisited and have min distance
-  nodeToVisit = unvisitedDijkstraSortedArray.shift();
-
-  //mark next node as visited
-  if (nodeToVisit) {
-    nodeToVisit = `${nodeToVisit.x}-${nodeToVisit.y}`;
-    visitedNodes[nodeToVisit] = 1;
-    const coords = nodeToVisit.split("-");
-    shortestPath(+coords[0], +coords[1]);
-  }
 }
+
+const dijkstraManager = (x, y) => {
+  let check = true,
+    nodeToVisit;
+  shortestPath(x, y);
+  while (check) {
+    //find which node to visit and visit it
+    //choose from accassable(dijkstra[id] is not null) nodes  which is unvisited and have min distance
+
+    nodeToVisit = unvisitedDijkstraSortedArray.shift();
+
+    //mark next node as visited
+    if (nodeToVisit) {
+      nodeToVisit = `${nodeToVisit.x}-${nodeToVisit.y}`;
+      visitedNodes[nodeToVisit] = 1;
+      const coords = nodeToVisit.split("-");
+      shortestPath(+coords[0], +coords[1]);
+    } else check = false;
+  }
+};
 
 function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
   let min = null,
@@ -98,7 +102,8 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
   let path = [];
 
   dijkstraInit(startx, starty, pathLines);
-  shortestPath(startx, starty);
+  dijkstraManager(startx, starty);
+  // shortestPath(startx, starty);
 
   //find shortest path to get out the maze
   const outY = starty ? 0 : sizeY - 1;

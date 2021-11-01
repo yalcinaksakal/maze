@@ -5,6 +5,8 @@ const Paragraph = () => (
     Drag to rotate
     <br />
     Zoom in/out
+    <br />
+    Right click (Two touches) drag to pan
   </p>
 );
 export default Paragraph;

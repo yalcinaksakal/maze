@@ -24,6 +24,8 @@ const dDrawer = data => {
 
   const material = new LineBasicMaterial({
     color,
+    transparent: true,
+    opacity: 0.6,
   });
 
   const geometry = new BufferGeometry().setFromPoints(points);

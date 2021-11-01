@@ -30,7 +30,13 @@ class MazeGenerator {
   pathMap = {};
   stack = [];
   canContinue = true;
-  constructor(visitor, mazeSizeX = 40, mazeSizeY = 40, startX = 0, startY = 0) {
+  constructor(
+    visitor,
+    mazeSizeX = 150,
+    mazeSizeY = 150,
+    startX = 0,
+    startY = 0
+  ) {
     this.visitor = visitor;
     this.mazeSizeX = mazeSizeX;
     this.mazeSizeY = mazeSizeY;

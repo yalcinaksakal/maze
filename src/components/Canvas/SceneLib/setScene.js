@@ -64,7 +64,7 @@ const setScene = statusFunc => {
   //Mazegeneration-------------
   let line, walls, height, pathLines, visitor, maze, canAnimate;
   //visitor
-  const geometry = new CylinderBufferGeometry(5, 5, 2, 64);
+  const geometry = new CylinderBufferGeometry(25, 25, 5, 64);
   const material = new MeshBasicMaterial({
     color: "red",
     // transparent: true,
@@ -104,7 +104,7 @@ const setScene = statusFunc => {
 
   const processMaze = () => {
     if (maze.canContinue) {
-      const numOfMove = complexity.speed ** 1.5;
+      const numOfMove = complexity.speed ** 2;
       for (let i = 0; i < numOfMove; i++) {
         if (!maze.canContinue) break;
         line = maze.nodeTraveller();
@@ -124,6 +124,7 @@ const setScene = statusFunc => {
           calculating: true,
         })
       );
+
       dijkstraWorker.postMessage(
         JSON.stringify([maze.pathMap, maze.mazeSizeX, maze.mazeSizeY])
       );

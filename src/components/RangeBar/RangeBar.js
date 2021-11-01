@@ -3,7 +3,7 @@ import { changeComplexity, changeSpedd } from "../Canvas/MazeLib/buttonActions";
 import styles from "./RangeBar.module.scss";
 
 const RangeBar = ({ type }) => {
-  const [val, setVal] = useState(70);
+  const [val, setVal] = useState(type === "speed" ? 1 : 70);
   const style = { top: type === "speed" ? "150px" : "110px" };
   return (
     <div style={style} className={styles.c}>
@@ -14,7 +14,7 @@ const RangeBar = ({ type }) => {
         value={val}
         onChange={e => {
           setVal(e.currentTarget.value);
-          if (type === "speed") changeSpedd(+e.currentTarget.value / 11 + 1);
+          if (type === "speed") changeSpedd(+e.currentTarget.value / 5 + 1);
           else changeComplexity(+e.currentTarget.value / 100);
         }}
       />
