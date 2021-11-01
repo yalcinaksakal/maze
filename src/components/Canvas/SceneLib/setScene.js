@@ -131,7 +131,7 @@ const setScene = statusFunc => {
 
       dijkstraWorker.onmessage = e => {
         statusFunc(statusActions.addDone());
-        e.data !== "null" && dijkstraPaths.add(...dDrawer(JSON.parse(e.data)));
+        dijkstraPaths.add(...dDrawer(JSON.parse(e.data)));
       };
       // -------
       height = buttonActions.type === "instant" ? 15.9 : 0.1;

@@ -25,6 +25,7 @@ function App() {
       <Status />
       <RangeBar type={"complexity"} />
       <RangeBar type={"speed"} />
+      <RangeBar type={"size"} />
     </div>
   );
 }

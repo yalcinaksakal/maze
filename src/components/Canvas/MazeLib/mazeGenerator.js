@@ -30,13 +30,7 @@ class MazeGenerator {
   pathMap = {};
   stack = [];
   canContinue = true;
-  constructor(
-    visitor,
-    mazeSizeX = 150,
-    mazeSizeY = 150,
-    startX = 0,
-    startY = 0
-  ) {
+  constructor(visitor, mazeSizeX = 5, mazeSizeY = 5, startX = 0, startY = 0) {
     this.visitor = visitor;
     this.mazeSizeX = mazeSizeX;
     this.mazeSizeY = mazeSizeY;
@@ -73,6 +67,21 @@ class MazeGenerator {
       this.pathMap[`${x2}-${y2}:${x1}-${y1}`];
     for (let i = -1; i < this.mazeSizeX; i++)
       for (let j = 0; j < this.mazeSizeY; j++) {
+        //block some
+        if (
+          doesPathExist(i, j, i, j - 1) &&
+          i > -1 &&
+          j > 0 &&
+          this.mazeComplexity.c > 0.2 &&
+          Math.random() > 0.6
+        )
+          this.pathMap[`${i}-${j}:${i}-${j - 1}`] = null;
+        if (
+          doesPathExist(i, j, i + 1, j) &&
+          this.mazeComplexity.c > 0.2 &&
+          Math.random() > 0.7
+        )
+          this.pathMap[`${i}-${j}:${i + 1}-${j}`] = null;
         //down wall
         if (!doesPathExist(i, j, i, j - 1) && i > -1 && j > 0) {
           // open some more possibilites

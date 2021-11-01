@@ -116,7 +116,11 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
     }
   }
   //if no path
-  if (min === null) return null;
+  if (min === null)
+    return {
+      path: [{ x: startx, y: starty }],
+      direction: starty ? "down" : "up",
+    };
   //crete path from previousnodes
   let x = exit,
     temp,
@@ -138,5 +142,5 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
 onmessage = function (e) {
   const [x, y, startx, starty, pathes] = e.data;
   const result = dijkstraAction(pathes, startx, starty, x, y);
-  postMessage(result ? JSON.stringify(result) : "null");
+  postMessage(JSON.stringify(result));
 };
