@@ -87,6 +87,7 @@ const setScene = statusFunc => {
     visitor.position.set(-487, 10, -487);
     visitor.castShadow = true;
     scene.add(visitor);
+    maze = null;
     maze = new MazeGenerator(visitor);
 
     //worker
@@ -103,7 +104,9 @@ const setScene = statusFunc => {
 
   const processMaze = () => {
     if (maze.canContinue) {
-      for (let i = 0; i < complexity.speed; i++) {
+      const numOfMove = complexity.speed ** 1.5;
+      for (let i = 0; i < numOfMove; i++) {
+        if (!maze.canContinue) break;
         line = maze.nodeTraveller();
         if (line) pathLines.add(line);
       }
@@ -114,7 +117,7 @@ const setScene = statusFunc => {
       scene.remove(pathLines);
 
       addPossibleCrossPathes(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
-      //starting workers
+      // starting workers
       statusFunc(
         statusActions.setCalculating({
           total: 2 * maze.mazeSizeX,

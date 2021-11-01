@@ -1,8 +1,8 @@
-let dijkstra, visitedNodes, previousNode, pathes, unvisitedDijkstraSortedArray;
+let dijkstra, visitedNodes, previousNode, pathes;
 //dijkstra: shortest distance from starting node
 function dijkstraInit(x, y, pathLines) {
   if (!pathes) pathes = pathLines;
-  unvisitedDijkstraSortedArray = [];
+
   dijkstra = {};
   visitedNodes = {};
   previousNode = {};
@@ -10,45 +10,9 @@ function dijkstraInit(x, y, pathLines) {
   visitedNodes[`${x}-${y}`] = 1;
 }
 
-const setDijkstraSortedArray = (x, y, value, processType) => {
-  let low = 0,
-    mid = 0,
-    high = unvisitedDijkstraSortedArray.length;
-
-  while (low < high) {
-    mid = (low + high) >>> 1;
-    if (unvisitedDijkstraSortedArray[mid].value < value) low = mid + 1;
-    else high = mid;
-  }
-  //low is the position in sorted array
-  if (processType === "delete") {
-    let check = false,
-      repeat = true;
-    while (!check && repeat) {
-      repeat = unvisitedDijkstraSortedArray[mid]?.value === value;
-      check =
-        unvisitedDijkstraSortedArray[mid]?.x === x &&
-        unvisitedDijkstraSortedArray[mid]?.y === y &&
-        repeat;
-
-      mid++;
-    }
-    if (check) unvisitedDijkstraSortedArray.splice(mid - 1, 1);
-    return;
-  }
-  //add
-  unvisitedDijkstraSortedArray.splice(mid, 0, { x, y, value });
-};
-
 function setNewDistance(x1, y1, x2, y2, newDistance) {
   previousNode[`${x2}-${y2}`] = { x: x1, y: y1 };
   dijkstra[`${x2}-${y2}`] = newDistance;
-  //if this node x2,y2 is visited , dont add into sorted array
-  if (visitedNodes[`${x2}-${y2}`]) return;
-  //if not visited, find old place and delete it from sorted arr
-  setDijkstraSortedArray(x2, y2, newDistance, "delete");
-  //find ne position and add it to sorted arr
-  setDijkstraSortedArray(x2, y2, newDistance, "add");
 }
 
 // 12-0:13-0  = 1  pathes from:to
@@ -78,13 +42,18 @@ function shortestPath(x, y) {
     }
 
   //find which node to visit and visit it
-
+  nodeToVisit = null;
+  newDistance = 0;
   //choose from accassable(dijkstra[id] is not null) nodes  which is unvisited and have min distance
-  nodeToVisit = unvisitedDijkstraSortedArray.shift();
 
+  for (const [key, value] of Object.entries(dijkstra)) {
+    if (!visitedNodes[key] && (value < newDistance || !nodeToVisit)) {
+      nodeToVisit = key;
+      newDistance = value;
+    }
+  }
   //mark next node as visited
   if (nodeToVisit) {
-    nodeToVisit = `${nodeToVisit.x}-${nodeToVisit.y}`;
     visitedNodes[nodeToVisit] = 1;
     const coords = nodeToVisit.split("-");
     shortestPath(+coords[0], +coords[1]);
