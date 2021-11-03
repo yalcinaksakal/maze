@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { useDispatch } from "react-redux";
+import { setSceneController } from "./MazeLib/buttonActions";
 
 import setScene from "./SceneLib/setScene";
 
@@ -10,29 +11,16 @@ const Canvas = () => {
   useEffect(() => {
     // console.log("canvas");
 
-    const { domElement, onResize, animate, keyDownHandler, keyUpHandler } =
-      setScene(dispatch);
+    const { domElement, onResize, animate } = setScene(dispatch);
+    setSceneController(animate);
     canvasRef.current.appendChild(domElement);
-    let frameId;
-
-    const RAF = () => {
-      animate();
-      frameId = requestAnimationFrame(RAF);
-    };
-
     //resize
     window.addEventListener("resize", onResize);
-    window.addEventListener("keydown", keyDownHandler);
-    window.addEventListener("keyup", keyUpHandler);
-    //start animation
-    RAF();
 
     //cleanup
     return () => {
-      cancelAnimationFrame(frameId);
       window.removeEventListener("resize", onResize);
-      window.removeEventListener("keydown", keyDownHandler);
-      window.removeEventListener("keyup", keyUpHandler);
+
       domElement.remove();
     };
   }, [dispatch]);

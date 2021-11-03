@@ -106,7 +106,7 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
   // shortestPath(startx, starty);
 
   //find shortest path to get out the maze
-  const outY = starty ? 0 : sizeY - 1;
+  let outY = starty ? 0 : sizeY - 1;
   for (let i = 0; i < sizeX; i++) {
     current = dijkstra[`${i}-${outY}`];
     if (!current) continue;
@@ -115,17 +115,37 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
       min = current;
     }
   }
-  //if no path
-  if (min === null)
-    return {
-      path: [{ x: startx, y: starty }],
-      direction: starty ? "down" : "up",
-    };
-  //crete path from previousnodes
-  let x = exit,
-    temp,
-    y = outY;
 
+  let x,
+    temp,
+    y,
+    doesPathExist = true;
+  // // if no path return reachable max distance as path
+  // if (min === null) {
+  //   temp = Object.keys(dijkstra)
+  //     .reduce((a, b) => (dijkstra[a] > dijkstra[b] ? a : b))
+  //     .split("-");
+  //   exit = temp[0];
+  //   outY = temp[1];
+  //   doesPathExist = false;
+  // }
+
+  //if no path
+  if (min === null) {
+    for (const [k, v] of Object.entries(previousNode)) {
+      temp = k.split("-");
+      path.push({ x: +temp[0], y: +temp[1] }, v);
+    }
+    doesPathExist = false;
+    return {
+      path,
+      direction: starty ? "down" : "up",
+      doesPathExist,
+    };
+  }
+  // crete path from previousnodes
+  x = exit;
+  y = outY;
   path.unshift({ x: exit, y: starty ? -5 : sizeY + 4 });
   path.unshift({ x: exit, y });
 
@@ -136,7 +156,7 @@ function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
     path.unshift({ x, y });
   }
   path.unshift({ x, y: starty ? sizeY : -1 });
-  return { path, direction: starty ? "down" : "up" };
+  return { path, direction: starty ? "down" : "up", doesPathExist };
 }
 
 onmessage = function (e) {

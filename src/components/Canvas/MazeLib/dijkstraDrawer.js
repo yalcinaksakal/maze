@@ -10,30 +10,34 @@ import {
   Vector3,
 } from "three";
 
-const dDrawer = data => {
-  const { path, direction } = data;
+const dDrawer = (data, start) => {
+  const { path, direction, doesPathExist } = data;
   const points = [];
-  const shift = direction === "up" ? -2 : 2;
+  const shift =
+    ((doesPathExist ? (direction === "up" ? -1 : 1) : 0) * path[0].x) / 10;
 
   const rndm = () => Math.floor(Math.random() * 256);
-  let color = `rgb(0,${direction === "up" ? "255" : rndm()},${
-    direction === "up" ? rndm() : "255"
-  })`;
+
+  let color = doesPathExist
+    ? `rgb(${direction === "up" ? 255 : 0},${rndm()},${rndm()})`
+    : direction === "up"
+    ? "red"
+    : "black";
+
   for (const point of path)
     points.push(
-      new Vector3(-487 + point.x * 25 + shift, 15, -487 + point.y * 25)
+      new Vector3(
+        start + 13 + point.x * 25 + shift,
+        15 + shift,
+        start + 13 + point.y * 25
+      )
     );
 
   const material = new LineBasicMaterial({
     color,
-    transparent: true,
-    opacity: 0.6,
   });
 
-  const geometry = new BufferGeometry().setFromPoints(points);
-  const line = new Line(geometry, material);
-  line.castShadow = true;
-
+  let geos;
   const firstPoint = points[0];
   let startFigure;
 
@@ -46,21 +50,25 @@ const dDrawer = data => {
     return result;
   };
 
-  if (points.length > 1) {
+  if (doesPathExist) {
     const geometryArrow = new ConeGeometry(10, 20, 16);
     geometryArrow.rotateX(((direction === "up" ? 1 : -1) * Math.PI) / 2);
     startFigure = createStartFigure(geometryArrow);
+
+    //path
+    const geometry = new BufferGeometry().setFromPoints(points);
+    geos = new Line(geometry, material);
   } else {
+    //cross sign
     const geometryCross = new BoxBufferGeometry(2, 5, 20);
     geometryCross.rotateY(Math.PI / 4);
-    color = "red";
     startFigure = new Group();
     startFigure.add(createStartFigure(geometryCross));
     startFigure.add(
       createStartFigure(geometryCross.clone().rotateY(-Math.PI / 2))
     );
   }
-  return [line, startFigure];
+  return [geos, startFigure];
 };
 
 export default dDrawer;

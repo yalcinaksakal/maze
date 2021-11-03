@@ -1,41 +1,45 @@
 import {
-  // BoxBufferGeometry,
   Color,
   CylinderBufferGeometry,
   Group,
   Mesh,
   MeshBasicMaterial,
-  // Mesh,
-  // MeshBasicMaterial,
   Scene,
 } from "three";
 import { statusActions } from "../../../store/status";
 import addPossibleCrossPathes from "../MazeLib/addPossibleCrossPaths";
 
 import buttonActions, { complexity } from "../MazeLib/buttonActions";
-// import dijkstraAction from "../MazeLib/dijkstra";
+
 import dDrawer from "../MazeLib/dijkstraDrawer";
 
 import MazeGenerator from "../MazeLib/mazeGenerator";
 
-// import createPath from "../MazeLib/createPath";
-
 import myCam from "./camera";
 
-// import createNodes, { createWalls } from "./createNodesAndWalls";
 import createPlane from "./createPlane";
 
 import createLights from "./lights";
-// import drawer from "./pathDrawer";
 
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
 
 let dijkstraWorker;
 
+//visitor
+const geometry = new CylinderBufferGeometry(25, 25, 5, 64);
+const material = new MeshBasicMaterial({
+  color: "red",
+  // transparent: true,
+  // opacity: 0.8,
+});
+const visitor = new Mesh(geometry, material);
+visitor.position.set(-487, 10, -487);
+visitor.castShadow = true;
+visitor.visible = false;
+
 const setScene = statusFunc => {
-  // let paths;
-  let dijkstraPaths;
+  let dijkstraPaths, line, walls, height, pathLines, maze, canAnimate;
   //renderer
   const renderer = createR();
   //camera
@@ -54,39 +58,39 @@ const setScene = statusFunc => {
   //add controls
   const controls = setOrbitControls(camera, domElement);
 
-  //plane
-  scene.add(createPlane());
-
   //nodes and walls
   // scene.add(createNodes());
   // scene.add(createWalls());
 
-  //Mazegeneration-------------
-  let line, walls, height, pathLines, visitor, maze, canAnimate;
+  const groupCreator = () => {
+    const newGroup = new Group();
+    scene.add(newGroup);
+    return newGroup;
+  };
+  //initial objects------------
+  //plane
+  scene.add(createPlane());
   //visitor
-  const geometry = new CylinderBufferGeometry(25, 25, 5, 64);
-  const material = new MeshBasicMaterial({
-    color: "red",
-    // transparent: true,
-    // opacity: 0.8,
-  });
+  scene.add(visitor);
+  //lines
+  pathLines = groupCreator();
+  //dijkstra paths
+  dijkstraPaths = groupCreator();
+  //dijkstra paths
+  walls = groupCreator();
+
+  //Mazegeneration-------------
   const initialMazeSetup = () => {
     canAnimate = false;
-    scene.remove(walls);
+
     // scene.remove(paths);
-    walls = null;
+
     height = 16;
-    //lines
-    scene.remove(pathLines);
-    pathLines = new Group();
-    scene.add(pathLines);
 
     //visitor
-    scene.remove(visitor);
-    visitor = new Mesh(geometry, material);
     visitor.position.set(-487, 10, -487);
-    visitor.castShadow = true;
-    scene.add(visitor);
+    visitor.visible = true;
+
     maze = null;
     maze = new MazeGenerator(visitor);
 
@@ -94,27 +98,31 @@ const setScene = statusFunc => {
     dijkstraWorker?.terminate();
     dijkstraWorker = new Worker("./dijkstraWorker.js");
 
-    //dijkstraPaths
-    scene.remove(dijkstraPaths);
-    dijkstraPaths = new Group();
-    scene.add(dijkstraPaths);
+    //dijkstraPaths lines walls
+    const resetGroups = items => {
+      items.forEach(item => {
+        item.children = [];
+        item.visible = true;
+      });
+    };
+    resetGroups([dijkstraPaths, pathLines, walls]);
 
     statusFunc(statusActions.stop());
   };
 
   const processMaze = () => {
     if (maze.canContinue) {
-      const numOfMove = complexity.speed ** 2;
+      //simulation speed
+      const numOfMove = complexity.speed;
       for (let i = 0; i < numOfMove; i++) {
         if (!maze.canContinue) break;
         line = maze.nodeTraveller();
         if (line) pathLines.add(line);
       }
-    } else if (!walls) {
-      walls = maze.getWalls();
-      scene.add(walls);
-      scene.remove(visitor);
-      scene.remove(pathLines);
+    } else if (!walls.children.length) {
+      walls = maze.getWalls(walls);
+      visitor.visible = false;
+      pathLines.visible = false;
 
       addPossibleCrossPathes(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
       // starting workers
@@ -131,7 +139,8 @@ const setScene = statusFunc => {
 
       dijkstraWorker.onmessage = e => {
         statusFunc(statusActions.addDone());
-        dijkstraPaths.add(...dDrawer(JSON.parse(e.data)));
+        dijkstraPaths.add(...dDrawer(JSON.parse(e.data), maze.start));
+        requestRenderIfNotRequested();
       };
       // -------
       height = buttonActions.type === "instant" ? 15.9 : 0.1;
@@ -145,23 +154,38 @@ const setScene = statusFunc => {
     }
   };
 
+  const mazeAnimationControl = () => {
+    if (canAnimate) {
+      animate();
+      requestAnimationFrame(mazeAnimationControl);
+    }
+  };
+
+  const start = () => {
+    canAnimate = true;
+    mazeAnimationControl();
+  };
+
   const instantMaze = () => {
     initialMazeSetup();
     while (maze.canContinue) processMaze();
-    canAnimate = true;
+    start();
   };
   const simulateMaze = () => {
     initialMazeSetup();
-    canAnimate = true;
+    start();
   };
 
-  const toggleLines = () => {
-    if (!dijkstraPaths) return;
-    dijkstraPaths.parent === scene
-      ? scene.remove(dijkstraPaths)
-      : scene.add(dijkstraPaths);
-  };
+  const toggleLines = () => (dijkstraPaths.visible = !dijkstraPaths.visible);
+
   //animate--------------------
+  let renderRequested = false;
+
+  const render = () => {
+    if (renderRequested) renderRequested = undefined;
+    controls.update();
+    renderer.render(scene, camera);
+  };
 
   const animate = () => {
     if (buttonActions.pressed) {
@@ -172,27 +196,38 @@ const setScene = statusFunc => {
         ? simulateMaze()
         : toggleLines();
     }
-    if (canAnimate) processMaze();
-    renderer.render(scene, camera);
-    controls.update();
+    processMaze();
+    //scene
+    render();
   };
 
+  // request animation when user interacts, orbitcontrols change
+  function requestRenderIfNotRequested() {
+    //if it is already animating return
+    if (canAnimate) return;
+    // animate on changes in orbits
+    if (!renderRequested) {
+      renderRequested = true;
+      requestAnimationFrame(render);
+    }
+  }
+  controls.addEventListener("change", requestRenderIfNotRequested);
+  //init
+  render();
+
+  ///-----------------------------
   //onResize
   const onResize = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
+    requestRenderIfNotRequested();
   };
 
-  const keyDownHandler = ({ code }) => {};
-  const keyUpHandler = ({ code }) => {};
-
   return {
-    animate,
     domElement,
     onResize,
-    keyDownHandler,
-    keyUpHandler,
+    animate,
   };
 };
 

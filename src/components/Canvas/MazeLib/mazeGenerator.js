@@ -1,7 +1,6 @@
 import {
   BoxBufferGeometry,
   BufferGeometry,
-  Group,
   Line,
   LineBasicMaterial,
   Mesh,
@@ -30,13 +29,20 @@ class MazeGenerator {
   pathMap = {};
   stack = [];
   canContinue = true;
-  constructor(visitor, mazeSizeX = 5, mazeSizeY = 5, startX = 0, startY = 0) {
+  constructor(
+    visitor,
+    mazeSizeX = complexity.size,
+    mazeSizeY = complexity.size,
+    startX = 0,
+    startY = 0
+  ) {
     this.visitor = visitor;
     this.mazeSizeX = mazeSizeX;
     this.mazeSizeY = mazeSizeY;
     this.X = startX ? startX : this.pickRandomly(mazeSizeX);
     this.Y = startY;
     this.mazeComplexity = complexity;
+    this.start = -(mazeSizeX * 25) / 2;
   }
 
   isNodeValid = (x, y) =>
@@ -59,8 +65,7 @@ class MazeGenerator {
 
   pickRandomly = length => Math.floor(Math.random() * length);
 
-  getWalls() {
-    const walls = new Group();
+  getWalls(walls) {
     let wall;
     const doesPathExist = (x1, y1, x2, y2) =>
       this.pathMap[`${x1}-${y1}:${x2}-${y2}`] ||
@@ -69,19 +74,13 @@ class MazeGenerator {
       for (let j = 0; j < this.mazeSizeY; j++) {
         //block some
         if (
-          doesPathExist(i, j, i, j - 1) &&
-          i > -1 &&
-          j > 0 &&
           this.mazeComplexity.c > 0.2 &&
-          Math.random() > 0.6
+          j > 5 &&
+          j < this.mazeSizeY - 5 &&
+          Math.random() > 0.99
         )
           this.pathMap[`${i}-${j}:${i}-${j - 1}`] = null;
-        if (
-          doesPathExist(i, j, i + 1, j) &&
-          this.mazeComplexity.c > 0.2 &&
-          Math.random() > 0.7
-        )
-          this.pathMap[`${i}-${j}:${i + 1}-${j}`] = null;
+
         //down wall
         if (!doesPathExist(i, j, i, j - 1) && i > -1 && j > 0) {
           // open some more possibilites
@@ -90,7 +89,11 @@ class MazeGenerator {
             this.pathMap[`${i}-${j}:${i}-${j - 1}`] = 1;
           } else {
             wall = new Mesh(boxGeometryHorizantal, boxMaterial);
-            wall.position.set(-487 + i * 25, -7.5, -500 + j * 25);
+            wall.position.set(
+              this.start + 13 + i * 25,
+              -7.5,
+              this.start + j * 25
+            );
             wall.castShadow = true;
             wall.receiveShadow = true;
             walls.add(wall);
@@ -107,7 +110,11 @@ class MazeGenerator {
             this.pathMap[`${i}-${j}:${i + 1}-${j}`] = 1;
           } else {
             wall = new Mesh(boxGeometryVertical, boxMaterial);
-            wall.position.set(-475 + i * 25, -7.5, -487 + j * 25);
+            wall.position.set(
+              this.start + 25 + i * 25,
+              -7.5,
+              this.start + 13 + j * 25
+            );
             wall.castShadow = true;
             wall.receiveShadow = true;
             walls.add(wall);
@@ -118,8 +125,16 @@ class MazeGenerator {
   }
 
   drawer = (x, y) => {
-    const oldPoint = new Vector3(-487 + this.X * 25, 10, -487 + this.Y * 25);
-    const newPoint = new Vector3(-487 + x * 25, 10, -487 + y * 25);
+    const oldPoint = new Vector3(
+      this.start + 13 + this.X * 25,
+      10,
+      this.start + 13 + this.Y * 25
+    );
+    const newPoint = new Vector3(
+      this.start + 13 + x * 25,
+      10,
+      this.start + 13 + y * 25
+    );
     const geometry = new BufferGeometry().setFromPoints([oldPoint, newPoint]);
     this.X = x;
     this.Y = y;
@@ -130,14 +145,23 @@ class MazeGenerator {
     const neighbours = this.getVisitableNeighbours(this.X, this.Y);
     if (!neighbours.length) {
       this.stack.pop();
-      this.X = this.stack[this.stack.length - 1].x;
-      this.Y = this.stack[this.stack.length - 1].y;
-      this.visitor.position.set(-487 + this.X * 25, 10, -487 + this.Y * 25);
+      this.X = this.stack[this.stack.length - 1]?.x;
+      this.Y = this.stack[this.stack.length - 1]?.y;
+      this.visitor.position.set(
+        this.start + 13 + this.X * 25,
+        10,
+        this.start + 13 + this.Y * 25
+      );
       return null;
     } else {
       let { x, y } = neighbours[this.pickRandomly(neighbours.length)];
+
       this.pathMap[`${this.X}-${this.Y}:${x}-${y}`] = 1;
-      this.visitor.position.set(-487 + x * 25, 10, -487 + y * 25);
+      this.visitor.position.set(
+        this.start + 13 + x * 25,
+        10,
+        this.start + 13 + y * 25
+      );
       this.stack.push({ x, y });
       this.numVisitedNodes++;
       this.canContinue =

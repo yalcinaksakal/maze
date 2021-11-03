@@ -4,6 +4,7 @@ import {
   changeSize,
   changeSpedd,
 } from "../Canvas/MazeLib/buttonActions";
+
 import styles from "./RangeBar.module.scss";
 
 const RangeBar = ({ type }) => {
@@ -11,29 +12,32 @@ const RangeBar = ({ type }) => {
     type === "speed" ? 1 : type === "size" ? 50 : 70
   );
   const style = {
-    top: type === "size" ? "210px" : type === "speed" ? "155px" : "110px",
+    top: type === "size" ? "40px" : type === "speed" ? "165px" : "80px",
   };
+
   return (
     <div style={style} className={styles.c}>
       <input
         type={"range"}
-        min={type === "size" ? 1 : 0}
+        min={type === "size" ? 2 : 0}
         max={type === "size" ? 150 : 100}
         value={val}
         onChange={e => {
           setVal(e.currentTarget.value);
-          if (type === "speed") changeSpedd(+e.currentTarget.value / 5 + 1);
+          if (type === "speed") changeSpedd(+e.currentTarget.value);
           else if (type === "complexity")
             changeComplexity(+e.currentTarget.value / 100);
           else changeSize(+e.currentTarget.value);
         }}
       />
+
       <p>
         {type === "size"
-          ? "Maze Size"
+          ? "Size : "
           : type === "speed"
-          ? "simulation speed"
-          : "complexity"}
+          ? "simulation speed : "
+          : "complexity : "}
+        {val}
       </p>
     </div>
   );
