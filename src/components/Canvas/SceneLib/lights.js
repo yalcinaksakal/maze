@@ -12,7 +12,7 @@ const createLights = () => {
   plight.shadow.mapSize.width = 2048; // default
   plight.shadow.mapSize.height = 2048; // default
   plight.shadow.camera.near = 0.5; // default
-  plight.shadow.camera.far = 2000; // default
+  plight.shadow.camera.far = 5000; // default
 
   return {
     d: light,

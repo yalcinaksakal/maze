@@ -1,9 +1,11 @@
 import { PlaneGeometry, MeshStandardMaterial, DoubleSide, Mesh } from "three";
 
 //Plane
-const createPlane = () => {
+const createPlane = dimension => {
+  //distance from edges is 250
+  dimension += 200;
   const plane = new Mesh(
-    new PlaneGeometry(1500, 1500, 2, 2),
+    new PlaneGeometry(dimension, dimension + 300, 1, 1),
     new MeshStandardMaterial({
       color: "beige",
       // transparent: true,

@@ -6,6 +6,7 @@ import {
   MeshBasicMaterial,
   Scene,
 } from "three";
+
 import { statusActions } from "../../../store/status";
 import addPossibleCrossPathes from "../MazeLib/addPossibleCrossPaths";
 
@@ -15,7 +16,7 @@ import dDrawer from "../MazeLib/dijkstraDrawer";
 
 import MazeGenerator from "../MazeLib/mazeGenerator";
 
-import myCam from "./camera";
+import myCam, { changeCamPos } from "./camera";
 
 import createPlane from "./createPlane";
 
@@ -39,11 +40,12 @@ visitor.castShadow = true;
 visitor.visible = false;
 
 const setScene = statusFunc => {
-  let dijkstraPaths, line, walls, height, pathLines, maze, canAnimate;
+  let plane, dijkstraPaths, line, walls, height, pathLines, maze, canAnimate;
   //renderer
   const renderer = createR();
-  //camera
-  const camera = myCam();
+
+  //camera, inital position is (50/2)*25, maze's inital size is 50
+  const camera = myCam(625);
   //scene
   const scene = new Scene();
   scene.background = new Color("#748B97");
@@ -67,9 +69,8 @@ const setScene = statusFunc => {
     scene.add(newGroup);
     return newGroup;
   };
+
   //initial objects------------
-  //plane
-  scene.add(createPlane());
   //visitor
   scene.add(visitor);
   //lines
@@ -78,27 +79,33 @@ const setScene = statusFunc => {
   dijkstraPaths = groupCreator();
   //dijkstra paths
   walls = groupCreator();
+  //plane
+  plane = createPlane(1250);
+  scene.add(plane);
 
   //Mazegeneration-------------
   const initialMazeSetup = () => {
     canAnimate = false;
-
-    // scene.remove(paths);
-
     height = 16;
 
-    //visitor
-    visitor.position.set(-487, 10, -487);
-    visitor.visible = true;
+    //plane
+    scene.remove(plane);
+    plane = createPlane(25 * complexity.size);
+    scene.add(plane);
 
-    maze = null;
+    //visitor
+    visitor.visible = true;
+    //maze
+    // maze = null;
     maze = new MazeGenerator(visitor);
 
+    //camera
+    changeCamPos((25 * complexity.size) / 2);
     //worker
     dijkstraWorker?.terminate();
     dijkstraWorker = new Worker("./dijkstraWorker.js");
 
-    //dijkstraPaths lines walls
+    //dijkstraPaths,lines,walls
     const resetGroups = items => {
       items.forEach(item => {
         item.children = [];
@@ -215,7 +222,6 @@ const setScene = statusFunc => {
   //init
   render();
 
-  ///-----------------------------
   //onResize
   const onResize = () => {
     camera.aspect = window.innerWidth / window.innerHeight;
