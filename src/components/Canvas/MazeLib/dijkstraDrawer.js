@@ -10,9 +10,21 @@ import {
   Vector3,
 } from "three";
 
+const geometryCross1 = new BoxBufferGeometry(2, 5, 20);
+geometryCross1.rotateY(Math.PI / 4);
+const geometryCross2 = geometryCross1.clone();
+geometryCross2.rotateY(-Math.PI / 2);
+
+const geometryArrowUp = new ConeGeometry(10, 20, 16);
+geometryArrowUp.rotateX(Math.PI / 2);
+
+const geometryArrowDown = new ConeGeometry(10, 20, 16);
+geometryArrowDown.rotateX(-Math.PI / 2);
+
 const dDrawer = (data, start) => {
   const { path, direction, doesPathExist } = data;
   const points = [];
+
   const shift =
     ((doesPathExist ? (direction === "up" ? -1 : 1) : 0) * path[0].x) / 10;
 
@@ -27,48 +39,44 @@ const dDrawer = (data, start) => {
   for (const point of path)
     points.push(
       new Vector3(
-        start + 13 + point.x * 25 + shift,
+        start + 13 + point.x * 25,
         15 + shift,
         start + 13 + point.y * 25
       )
     );
 
-  const material = new LineBasicMaterial({
+  const lineMaterial = new LineBasicMaterial({
     color,
   });
 
-  let geos;
+  const result = [];
   const firstPoint = points[0];
-  let startFigure;
 
   const createStartFigure = geometry => {
     const result = new Mesh(geometry, new MeshBasicMaterial({ color }));
-
     result.position.set(firstPoint.x, firstPoint.y, firstPoint.z);
     result.castShadow = true;
-
     return result;
   };
 
   if (doesPathExist) {
-    const geometryArrow = new ConeGeometry(10, 20, 16);
-    geometryArrow.rotateX(((direction === "up" ? 1 : -1) * Math.PI) / 2);
-    startFigure = createStartFigure(geometryArrow);
-
+    result.push(
+      createStartFigure(
+        direction === "up" ? geometryArrowUp : geometryArrowDown
+      )
+    );
     //path
-    const geometry = new BufferGeometry().setFromPoints(points);
-    geos = new Line(geometry, material);
+    const lineGeometry = new BufferGeometry().setFromPoints(points);
+    result.push(new Line(lineGeometry, lineMaterial));
   } else {
     //cross sign
-    const geometryCross = new BoxBufferGeometry(2, 5, 20);
-    geometryCross.rotateY(Math.PI / 4);
-    startFigure = new Group();
-    startFigure.add(createStartFigure(geometryCross));
-    startFigure.add(
-      createStartFigure(geometryCross.clone().rotateY(-Math.PI / 2))
-    );
+    let cross = new Group();
+    cross.add(createStartFigure(geometryCross1));
+    cross.add(createStartFigure(geometryCross2));
+    result.push(cross);
   }
-  return [geos, startFigure];
+  if (points[0].y === 1) console.log(points);
+  return result;
 };
 
 export default dDrawer;

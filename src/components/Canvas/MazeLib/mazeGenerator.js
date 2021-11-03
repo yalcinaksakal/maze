@@ -84,10 +84,10 @@ class MazeGenerator {
         //down wall
         if (!doesPathExist(i, j, i, j - 1) && i > -1 && j > 0) {
           // open some more possibilites
-          if (Math.random() > this.mazeComplexity.c) {
+          if (Math.random() > this.mazeComplexity.c)
             // console.log(`${i}-${j}:${i}-${j - 1}`);
             this.pathMap[`${i}-${j}:${i}-${j - 1}`] = 1;
-          } else {
+          else {
             wall = new Mesh(boxGeometryHorizantal, boxMaterial);
             wall.position.set(
               this.start + 13 + i * 25,

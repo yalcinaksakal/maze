@@ -82,7 +82,9 @@ const dijkstraManager = (x, y) => {
   while (check) {
     //find which node to visit and visit it
     //choose from accassable(dijkstra[id] is not null) nodes  which is unvisited and have min distance
+
     nodeToVisit = unvisitedDijkstraSortedArray.shift();
+
     //mark next node as visited
     if (nodeToVisit) {
       nodeToVisit = `${nodeToVisit.x}-${nodeToVisit.y}`;
@@ -93,19 +95,72 @@ const dijkstraManager = (x, y) => {
   }
 };
 
-function dijkstraAction(pathLines, startx, starty) {
+function dijkstraAction(pathLines, startx, starty, sizeX, sizeY) {
+  let min = null,
+    exit,
+    current;
+  let path = [];
+
   dijkstraInit(startx, starty, pathLines);
   dijkstraManager(startx, starty);
+  // shortestPath(startx, starty);
 
-  return {
-    dijkstra: { ...dijkstra },
-    previousNode: { ...previousNode },
-    startx,
-    starty,
-  };
+  //find shortest path to get out the maze
+  let outY = starty ? 0 : sizeY - 1;
+  for (let i = 0; i < sizeX; i++) {
+    current = dijkstra[`${i}-${outY}`];
+    if (!current) continue;
+    if (!min || min > current) {
+      exit = i;
+      min = current;
+    }
+  }
+
+  let x,
+    temp,
+    y,
+    doesPathExist = true;
+  // // if no path return reachable max distance as path
+  // if (min === null) {
+  //   temp = Object.keys(dijkstra)
+  //     .reduce((a, b) => (dijkstra[a] > dijkstra[b] ? a : b))
+  //     .split("-");
+  //   exit = temp[0];
+  //   outY = temp[1];
+  //   doesPathExist = false;
+  // }
+
+  //if no path return all possible pathes, previousNode
+  if (min === null) {
+    for (const k of Object.keys(previousNode)) {
+      temp = k.split("-");
+      path.push({ x: +temp[0], y: +temp[1] });
+    }
+    doesPathExist = false;
+    return {
+      path,
+      direction: starty ? "down" : "up",
+      doesPathExist,
+    };
+  }
+  // crete path from previousnodes
+  x = exit;
+  y = outY;
+  path.unshift({ x: exit, y: starty ? -5 : sizeY + 4 });
+  path.unshift({ x: exit, y });
+
+  while (x !== startx || y !== starty) {
+    temp = previousNode[`${x}-${y}`];
+    x = temp.x;
+    y = temp.y;
+    path.unshift({ x, y });
+  }
+  path.unshift({ x, y: starty ? sizeY : -1 });
+  return { path, direction: starty ? "down" : "up", doesPathExist };
 }
 
 onmessage = function (e) {
-  const [startx, starty, pathes] = e.data;
-  this.postMessage(dijkstraAction(pathes, startx, starty));
+  const [x, y, startx, starty, pathes] = e.data;
+  const result = dijkstraAction(pathes, startx, starty, x, y);
+  postMessage(result);
 };

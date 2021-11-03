@@ -45,7 +45,7 @@ const setScene = statusFunc => {
   const renderer = createR();
 
   //camera, inital position is (50/2)*25, maze's inital size is 50
-  const camera = myCam(625);
+  const camera = myCam(1250);
   //scene
   const scene = new Scene();
   scene.background = new Color("#748B97");
@@ -100,7 +100,7 @@ const setScene = statusFunc => {
     maze = new MazeGenerator(visitor);
 
     //camera
-    changeCamPos((25 * complexity.size) / 2);
+    changeCamPos(25 * complexity.size);
     //worker
     dijkstraWorker?.terminate();
     dijkstraWorker = new Worker("./dijkstraWorker.js");
@@ -140,13 +140,15 @@ const setScene = statusFunc => {
         })
       );
 
-      dijkstraWorker.postMessage(
-        JSON.stringify([maze.pathMap, maze.mazeSizeX, maze.mazeSizeY])
-      );
+      dijkstraWorker.postMessage([
+        maze.pathMap,
+        maze.mazeSizeX,
+        maze.mazeSizeY,
+      ]);
 
       dijkstraWorker.onmessage = e => {
         statusFunc(statusActions.addDone());
-        dijkstraPaths.add(...dDrawer(JSON.parse(e.data), maze.start));
+        dijkstraPaths.add(...dDrawer(e.data, maze.start));
         requestRenderIfNotRequested();
       };
       // -------

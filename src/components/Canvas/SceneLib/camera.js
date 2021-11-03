@@ -11,7 +11,7 @@ export const changeCamPos = newPos => {
 
 const myCam = pos => {
   //(-25*mazeSizeX,height,-25*mazeSizeY)
-  camera.position.set(-pos * 1.5, 2000, -pos * 1.5);
+  camera.position.set(-pos * 1.5, pos * 1.4, -pos * 1.5);
   return camera;
 };
 
