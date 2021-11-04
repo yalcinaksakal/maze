@@ -1,7 +1,16 @@
-let dijkstra, visitedNodes, previousNode, pathes, unvisitedDijkstraSortedArray;
+let dijkstra,
+  visitedNodes,
+  previousNode,
+  pathes,
+  unvisitedDijkstraSortedArray,
+  startx,
+  starty;
+
 //dijkstra: shortest distance from starting node
 function dijkstraInit(x, y, pathLines) {
   if (!pathes) pathes = pathLines;
+  startx = x;
+  starty = y;
   unvisitedDijkstraSortedArray = [];
   dijkstra = {};
   visitedNodes = {};
@@ -75,10 +84,10 @@ function shortestPath(x, y) {
     }
 }
 
-const dijkstraManager = (x, y) => {
+const dijkstraManager = () => {
   let check = true,
     nodeToVisit;
-  shortestPath(x, y);
+  shortestPath(startx, starty);
   while (check) {
     //find which node to visit and visit it
     //choose from accassable(dijkstra[id] is not null) nodes  which is unvisited and have min distance
@@ -91,21 +100,12 @@ const dijkstraManager = (x, y) => {
       shortestPath(+coords[0], +coords[1]);
     } else check = false;
   }
+
+  return { dijkstra, previousNode, startx, starty };
 };
-
-function dijkstraAction(pathLines, startx, starty) {
-  dijkstraInit(startx, starty, pathLines);
-  dijkstraManager(startx, starty);
-
-  return {
-    dijkstra: { ...dijkstra },
-    previousNode: { ...previousNode },
-    startx,
-    starty,
-  };
-}
 
 onmessage = function (e) {
   const [startx, starty, pathes] = e.data;
-  this.postMessage(dijkstraAction(pathes, startx, starty));
+  dijkstraInit(startx, starty, pathes);
+  this.postMessage(dijkstraManager());
 };

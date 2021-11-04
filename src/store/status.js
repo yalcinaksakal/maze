@@ -15,8 +15,8 @@ const status = createSlice({
       state.calculating = action.payload.calculating;
       state.done = 0;
     },
-    addDone(state) {
-      state.done++;
+    addDone(state, action) {
+      state.done += action.payload;
       if (state.done > state.total - 1) state.calculating = false;
     },
     stop(state) {

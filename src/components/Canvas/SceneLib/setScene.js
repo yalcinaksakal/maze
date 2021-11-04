@@ -100,7 +100,10 @@ const setScene = statusFunc => {
     maze = new MazeGenerator(visitor);
 
     //camera
-    changeCamPos(25 * complexity.size);
+
+    changeCamPos(
+      25 * (window.innerWidth > 600 ? complexity.size / 2 : complexity.size)
+    );
     //worker
     dijkstraWorker?.terminate();
     dijkstraWorker = new Worker("./dijkstraWorker.js");
@@ -147,9 +150,13 @@ const setScene = statusFunc => {
       ]);
 
       dijkstraWorker.onmessage = e => {
-        statusFunc(statusActions.addDone());
-        dijkstraPaths.add(...dDrawer(e.data, maze.start));
-        requestRenderIfNotRequested();
+        console.log(e.data.length);
+        statusFunc(statusActions.addDone(e.data.length));
+        e.data.length &&
+          e.data.forEach(d => {
+            dijkstraPaths.add(...dDrawer(d, maze.start));
+            requestRenderIfNotRequested();
+          });
       };
       // -------
       height = buttonActions.type === "instant" ? 15.9 : 0.1;

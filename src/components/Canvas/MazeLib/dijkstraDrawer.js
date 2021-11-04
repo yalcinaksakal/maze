@@ -75,7 +75,7 @@ const dDrawer = (data, start) => {
     cross.add(createStartFigure(geometryCross2));
     result.push(cross);
   }
-  if (points[0].y === 1) console.log(points);
+
   return result;
 };
 
