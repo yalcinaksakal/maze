@@ -41,12 +41,11 @@ const pathCreator = (
       pathes.push({
         path: [{ x, y: starty ? sizeY : -1 }, path[0]],
         direction: starty ? "down" : "up",
-        doesPathExist: true,
       });
     }
   }
   path.unshift({ x, y: starty ? sizeY : -1 });
-  pathes.push({ path, direction: starty ? "down" : "up", doesPathExist: true });
+  pathes.push({ path, direction: starty ? "down" : "up" });
   return pathes;
 };
 
@@ -84,7 +83,8 @@ function handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY) {
       current = reverseIndexer(+current[0], +current[1], sizeX);
       remainings[current] = -1;
     }
-    return { length, type: "noPaths" };
+
+    return { length, type: "emptyNoPaths" };
   }
 
   // crete pathes from previousnodes nd return it
@@ -99,6 +99,7 @@ onmessage = function (e) {
 
   const pickRandomly = () => {
     const pickList = remainings.filter(e => e !== -1);
+    if (!pickList.length) return false;
     const pick = pickList[Math.floor(Math.random() * pickList.length)];
     const [newx, newy] = indexer(pick);
 
@@ -118,10 +119,19 @@ onmessage = function (e) {
         handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY)
       );
 
-      if (swNo < 2 * sizeX) {
-        swNo++;
-        e.currentTarget.postMessage(pickRandomly());
-      } else subWorker.terminate();
+      // if there is remaining load, assign it to this subworker
+      const next = pickRandomly();
+      if (next) {
+        e.currentTarget.postMessage(next);
+      } else {
+        subWorker.terminate();
+        //count terminateds, if finishe return nodesofnopaths
+
+        // postMessage({
+        //   type: "nodesOfNoPaths",
+        //   nodesOfNoPaths,
+        // });
+      }
     };
   };
 

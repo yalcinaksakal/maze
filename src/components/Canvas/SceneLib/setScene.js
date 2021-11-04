@@ -21,6 +21,7 @@ import myCam, { changeCamPos } from "./camera";
 import createPlane from "./createPlane";
 
 import createLights from "./lights";
+import noPathDrawer from "./noPathDrawer";
 
 import createR from "./renderer";
 import setOrbitControls from "./setOrbitControls";
@@ -152,12 +153,22 @@ const setScene = statusFunc => {
 
       dijkstraWorker.onmessage = e => {
         statusFunc(statusActions.addDone(e.data.length));
-        //nopaths data.type=noPaths
+        //empty nopaths data.type=emptyNoPaths
+
         !e.data.type &&
           e.data.forEach(d => {
             dijkstraPaths.add(...dDrawer(d, maze.start));
             requestRenderIfNotRequested();
           });
+
+        if ((e.data.type = "nodesOfNoPaths")) {
+          // console.log(e.data.nodesOfNoPaths);
+          // dijkstraPaths.add(noPathDrawer(e.data.nodesOfNoPaths));
+          // dijkstraWorker.terminate();
+          // dijkstraWorker = null;
+          // statusFunc(statusActions.stop());
+          // requestRenderIfNotRequested();
+        }
       };
       // -------
       height = buttonActions.type === "instant" ? 15.9 : 0.1;
