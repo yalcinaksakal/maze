@@ -16,19 +16,17 @@ function App() {
   };
   return (
     <div className={styles.home}>
-      <button onClick={() => clicked("instant")}>Create Maze</button>
-      <button style={{ top: "125px" }} onClick={() => clicked("simulate")}>
-        Simulate Maze
-      </button>
-      <button style={{ top: "210px" }} onClick={() => clicked("toggle")}>
-        Toggle Lines
-      </button>
-      <Paragraph />
-      <Canvas />
+      <div className={styles.controls}>
+        <button onClick={() => clicked("instant")}>Create Maze</button>
+        <RangeBar type={"size"} />
+        <RangeBar type={"complexity"} />
+        <button onClick={() => clicked("simulate")}>Simulate Maze</button>
+        <RangeBar type={"speed"} />
+        <button onClick={() => clicked("toggle")}>Toggle Lines</button>
+      </div>
       <Status />
-      <RangeBar type={"complexity"} />
-      <RangeBar type={"speed"} />
-      <RangeBar type={"size"} />
+      <Canvas />
+      <Paragraph />
     </div>
   );
 }

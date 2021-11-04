@@ -2,11 +2,11 @@ import styles from "./p.module.scss";
 
 const Paragraph = () => (
   <p className={styles.p}>
-    Drag to rotate
+    Pan
     <br />
-    Zoom in/out
+    Zoom
     <br />
-    Right click (Two touches) drag to pan
+    Rotate
   </p>
 );
 export default Paragraph;

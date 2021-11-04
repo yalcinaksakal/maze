@@ -1,10 +1,13 @@
 let subworkers = [];
-let startOfNoPaths, nodesOfNoPaths, dones;
+let nodesOfNoPaths, remainings;
 
-const init = () => {
-  startOfNoPaths = new Set();
-  nodesOfNoPaths = new Set();
-  dones = {};
+const reverseIndexer = (x, y, size) => x + (y > 0 ? size : 0);
+
+const init = x => {
+  subworkers.forEach(sw => sw.terminate());
+  subworkers = [];
+  nodesOfNoPaths = {};
+  remainings = Array.from(Array(2 * x).keys());
 };
 
 const pathCreator = (
@@ -31,10 +34,12 @@ const pathCreator = (
     path.unshift({ x, y });
     //if previous nodes include neighbours of same row mark them as done too
     if (y !== starty) continue;
-    if (!dones[`${x}-${y}`]) {
-      dones[`${x}-${y}`] = 1;
+    temp = reverseIndexer(x, y, sizeX);
+    if (remainings[temp] !== -1) {
+      remainings[temp] = -1;
+      // path.push()
       pathes.push({
-        path: [{ x, y: starty ? sizeY : -1 }, ...path],
+        path: [{ x, y: starty ? sizeY : -1 }, path[0]],
         direction: starty ? "down" : "up",
         doesPathExist: true,
       });
@@ -51,8 +56,8 @@ function handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY) {
     current;
 
   //mark node as done
-  dones[`${startx}-${starty}`] = 1;
 
+  remainings[reverseIndexer(startx, starty, sizeX)] = -1;
   //find shortest path to get out the maze
 
   let outY = starty ? 0 : sizeY - 1;
@@ -67,17 +72,19 @@ function handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY) {
 
   //if no path return all possible pathes, previousNode
   if (min === null) {
-    return [];
-    //   for (const k of Object.keys(previousNode)) {
-    //     temp = k.split("-");
-    //     path.push({ x: +temp[0], y: +temp[1] });
-    //   }
-    //   doesPathExist = false;
-    //   return {
-    //     path,
-    //     direction: starty ? "down" : "up",
-    //     doesPathExist,
-    //   };
+    const dir = starty ? 1 : -1;
+    let length = 1;
+    nodesOfNoPaths[`${startx}-${starty}`] = dir;
+    for (const k of Object.keys(previousNode)) {
+      current = k.split("-");
+      nodesOfNoPaths[k] = dir;
+      //  //if previous nodes include neighbours of same row mark them as done too
+      if (+current[1] !== starty) continue;
+      length++;
+      current = reverseIndexer(+current[0], +current[1], sizeX);
+      remainings[current] = -1;
+    }
+    return { length, type: "noPaths" };
   }
 
   // crete pathes from previousnodes nd return it
@@ -85,46 +92,38 @@ function handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY) {
 }
 
 onmessage = function (e) {
-  subworkers.forEach(sw => sw.terminate());
-  subworkers = [];
-  init();
   const [pathes, sizeX, sizeY] = e.data;
+  init(sizeX);
+
   const indexer = input => [input % sizeX, input >= sizeX ? sizeY - 1 : 0];
 
-  let swNo = Math.min(50, sizeX); // max subworkers working at the same time
+  const pickRandomly = () => {
+    const pickList = remainings.filter(e => e !== -1);
+    const pick = pickList[Math.floor(Math.random() * pickList.length)];
+    const [newx, newy] = indexer(pick);
+
+    remainings[pick] = -1;
+    return [newx, newy];
+  };
+
+  let swNo = Math.ceil(sizeX / 3); // max subworkers working at the same time
 
   const newSubWorker = (x, y) => {
     const subWorker = new Worker("./dijkstraSubWorker.js");
     subworkers.push(subWorker);
     subWorker.postMessage([x, y, pathes]);
     subWorker.onmessage = e => {
-      //e.data=
-      // dijkstra,
-      // previousNode,
-      // startx,
-      // starty,
-      // console.log(e.data);
       const { dijkstra, previousNode, startx, starty } = e.data;
+      postMessage(
+        handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY)
+      );
 
-      if (!dones[`${startx}-${starty}`])
-        postMessage(
-          handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY)
-        );
-      let newx = startx,
-        newy = starty;
-      while (dones[`${newx}-${newy}`] && swNo < 2 * sizeX) {
-        newy = indexer(swNo);
-        newx = newy[0];
-        newy = newy[1];
+      if (swNo < 2 * sizeX) {
         swNo++;
-      }
-      //work for up and down sides of maze
-      if (!dones[`${newx}-${newy}`] && swNo <= 2 * sizeX) {
-        //one worker has finished, assign worker with new load
-        e.currentTarget.postMessage([newx, newy]);
+        e.currentTarget.postMessage(pickRandomly());
       } else subWorker.terminate();
     };
   };
 
-  for (let start = 0; start < swNo; start++) newSubWorker(...indexer(start));
+  for (let start = 0; start < swNo; start++) newSubWorker(...pickRandomly());
 };

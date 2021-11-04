@@ -102,7 +102,7 @@ const setScene = statusFunc => {
     //camera
 
     changeCamPos(
-      25 * (window.innerWidth > 600 ? complexity.size / 2 : complexity.size)
+      25 * (window.innerWidth > 600 ? complexity.size / 1.5 : complexity.size)
     );
     //worker
     dijkstraWorker?.terminate();
@@ -123,7 +123,8 @@ const setScene = statusFunc => {
   const processMaze = () => {
     if (maze.canContinue) {
       //simulation speed
-      const numOfMove = complexity.speed;
+      const numOfMove =
+        complexity.speed * (maze.mazeSizeX > 100 ? maze.mazeSizeX / 75 : 1);
       for (let i = 0; i < numOfMove; i++) {
         if (!maze.canContinue) break;
         line = maze.nodeTraveller();
@@ -150,9 +151,9 @@ const setScene = statusFunc => {
       ]);
 
       dijkstraWorker.onmessage = e => {
-        console.log(e.data.length);
         statusFunc(statusActions.addDone(e.data.length));
-        e.data.length &&
+        //nopaths data.type=noPaths
+        !e.data.type &&
           e.data.forEach(d => {
             dijkstraPaths.add(...dDrawer(d, maze.start));
             requestRenderIfNotRequested();

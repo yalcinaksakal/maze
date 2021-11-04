@@ -39,8 +39,8 @@ const dDrawer = (data, start) => {
   for (const point of path)
     points.push(
       new Vector3(
-        start + 13 + point.x * 25,
-        15 + shift,
+        start + 13 + point.x * 25 + shift,
+        18 + shift,
         start + 13 + point.y * 25
       )
     );

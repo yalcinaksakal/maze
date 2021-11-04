@@ -12,11 +12,11 @@ const RangeBar = ({ type }) => {
     type === "speed" ? 1 : type === "size" ? 50 : 70
   );
   const style = {
-    top: type === "size" ? "40px" : type === "speed" ? "165px" : "80px",
+    color: type === "speed" && +val === 0 ? "black" : "white",
   };
 
   return (
-    <div style={style} className={styles.c}>
+    <div className={styles.c}>
       <input
         type={"range"}
         min={type === "size" ? 2 : 0}
@@ -30,15 +30,7 @@ const RangeBar = ({ type }) => {
           else changeSize(+e.currentTarget.value);
         }}
       />
-
-      <p>
-        {type === "size"
-          ? "Size : "
-          : type === "speed"
-          ? "simulation speed : "
-          : "complexity : "}
-        {val}
-      </p>
+      <p style={style}>{type + " : " + val}</p>
     </div>
   );
 };
