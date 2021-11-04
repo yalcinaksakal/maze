@@ -1,4 +1,12 @@
-import { BoxBufferGeometry, Group, Mesh, MeshBasicMaterial } from "three";
+import {
+  BoxBufferGeometry,
+  Group,
+  Mesh,
+  MeshBasicMaterial,
+  Object3D,
+} from "three";
+
+import { mergeBufferGeometries } from "three/examples/jsm/utils/BufferGeometryUtils";
 
 const geometryCross1 = new BoxBufferGeometry(2, 5, 20);
 geometryCross1.rotateY(Math.PI / 4);
@@ -7,23 +15,36 @@ geometryCross2.rotateY(-Math.PI / 2);
 
 const matUp = new MeshBasicMaterial({ color: "red" });
 const matDown = new MeshBasicMaterial({ color: "black" });
+const positionHelper = new Object3D();
 
 const noPathDrawer = (nodes, start) => {
+  const up = [],
+    down = [];
   const createCross = (g, x, y, dir) => {
-    const result = new Mesh(g, dir < 0 ? matUp : matDown);
-    result.position.set(x, 3, y);
-    result.castShadow = true;
-    return result;
+    // const result = new Mesh(g, dir < 0 ? matUp : matDown);
+    const result = g.clone();
+    positionHelper.position.set(x, 3, y);
+    positionHelper.updateWorldMatrix(true, false);
+    result.applyMatrix4(positionHelper.matrixWorld);
+    dir < 0 ? up.push(result) : down.push(result);
   };
 
-  const result = new Group();
   let x, y;
   for (const [node, dir] of Object.entries(nodes)) {
     y = node.split("-");
     x = +y[0] * 25 + 13 + start;
     y = +y[1] * 25 + 13 + start;
-    result.add(createCross(geometryCross1, x, y, dir));
-    result.add(createCross(geometryCross2, x, y, dir));
+    createCross(geometryCross1, x, y, dir);
+    createCross(geometryCross2, x, y, dir);
+  }
+  const result = new Group();
+  if (up.length) {
+    const mergedUps = mergeBufferGeometries(up, false);
+    result.add(new Mesh(mergedUps, matUp));
+  }
+  if (down.length) {
+    const mergedDowns = mergeBufferGeometries(down, false);
+    result.add(new Mesh(mergedDowns, matDown));
   }
 
   return result;

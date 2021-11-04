@@ -18,7 +18,7 @@ const dDrawer = (data, start) => {
   const { path, direction } = data;
   const points = [];
 
-  const shift = ((direction === "up" ? -1 : 1) * path[0].x) / 10;
+  const shift = direction === "up" ? -2 : 2;
 
   const rndm = () => Math.floor(Math.random() * 256);
 
@@ -28,7 +28,7 @@ const dDrawer = (data, start) => {
     points.push(
       new Vector3(
         start + 13 + point.x * 25 + shift,
-        18 + shift,
+        10,
         start + 13 + point.y * 25
       )
     );
@@ -42,7 +42,7 @@ const dDrawer = (data, start) => {
 
   const createStartFigure = geometry => {
     const result = new Mesh(geometry, new MeshBasicMaterial({ color }));
-    result.position.set(firstPoint.x, firstPoint.y, firstPoint.z);
+    result.position.set(firstPoint.x, 5, firstPoint.z);
     result.castShadow = true;
     return result;
   };
