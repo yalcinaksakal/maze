@@ -5,11 +5,9 @@ import {
   LineBasicMaterial,
   Mesh,
   MeshBasicMaterial,
-  Object3D,
   Vector3,
 } from "three";
 import { complexity } from "./buttonActions";
-import { mergeBufferGeometries } from "three/examples/jsm/utils/BufferGeometryUtils";
 
 const material = new LineBasicMaterial({
   color: "dodgerblue",
@@ -24,8 +22,6 @@ const boxMaterial = new MeshBasicMaterial({
   transparent: true,
   opacity: 0.8,
 });
-
-const positionHelper = new Object3D();
 
 class MazeGenerator {
   visitedNodes = {};
@@ -71,7 +67,6 @@ class MazeGenerator {
 
   getWalls(walls) {
     let wall;
-    walls = [];
     const doesPathExist = (x1, y1, x2, y2) =>
       this.pathMap[`${x1}-${y1}:${x2}-${y2}`] ||
       this.pathMap[`${x2}-${y2}:${x1}-${y1}`];
@@ -93,17 +88,15 @@ class MazeGenerator {
             // console.log(`${i}-${j}:${i}-${j - 1}`);
             this.pathMap[`${i}-${j}:${i}-${j - 1}`] = 1;
           else {
-            wall = boxGeometryHorizantal.clone();
-            positionHelper.position.set(
+            wall = new Mesh(boxGeometryHorizantal, boxMaterial);
+            wall.position.set(
               this.start + 13 + i * 25,
               -7.5,
               this.start + j * 25
             );
-            // wall.castShadow = true;
-            // wall.receiveShadow = true;
-            positionHelper.updateWorldMatrix(true, false);
-            wall.applyMatrix4(positionHelper.matrixWorld);
-            walls.push(wall);
+            wall.castShadow = true;
+            wall.receiveShadow = true;
+            walls.add(wall);
           }
         }
         //right wall
@@ -116,26 +109,19 @@ class MazeGenerator {
             // console.log(`${i}-${j}:${i + 1}-${j}`);
             this.pathMap[`${i}-${j}:${i + 1}-${j}`] = 1;
           } else {
-            wall = boxGeometryVertical.clone();
-            positionHelper.position.set(
+            wall = new Mesh(boxGeometryVertical, boxMaterial);
+            wall.position.set(
               this.start + 25 + i * 25,
               -7.5,
               this.start + 13 + j * 25
             );
-            // wall.castShadow = true;
-            // wall.receiveShadow = true;
-            positionHelper.updateWorldMatrix(true, false);
-            wall.applyMatrix4(positionHelper.matrixWorld);
-            walls.push(wall);
+            wall.castShadow = true;
+            wall.receiveShadow = true;
+            walls.add(wall);
           }
         }
       }
-
-    const mergedWalls = mergeBufferGeometries(walls, false);
-    const result = new Mesh(mergedWalls, boxMaterial);
-    result.castShadow = true;
-    result.receiveShadow = true;
-    return result;
+    return walls;
   }
 
   drawer = (x, y) => {

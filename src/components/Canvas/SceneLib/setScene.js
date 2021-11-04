@@ -79,7 +79,7 @@ const setScene = statusFunc => {
   //dijkstra paths
   dijkstraPaths = groupCreator();
   //dijkstra paths
-  walls = groupCreator();
+  // walls = groupCreator();
   //plane
   plane = createPlane(1250);
   scene.add(plane);
@@ -119,7 +119,12 @@ const setScene = statusFunc => {
         item.visible = true;
       });
     };
-    resetGroups([dijkstraPaths, pathLines, walls]);
+    resetGroups([dijkstraPaths, pathLines]);
+
+    if (walls) {
+      scene.remove(walls);
+      walls = null;
+    }
 
     statusFunc(statusActions.stop());
   };
@@ -134,8 +139,9 @@ const setScene = statusFunc => {
         line = maze.nodeTraveller();
         if (line) pathLines.add(line);
       }
-    } else if (!walls.children.length) {
+    } else if (!walls) {
       walls = maze.getWalls(walls);
+      scene.add(walls);
       visitor.visible = false;
       pathLines.visible = false;
 
