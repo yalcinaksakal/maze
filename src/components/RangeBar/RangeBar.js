@@ -14,13 +14,13 @@ const RangeBar = ({ type }) => {
   const style = {
     color: type === "speed" && +val === 0 ? "black" : "white",
   };
-
+  const maxSize = window.innerWidth > 500 ? 150 : 100;
   return (
     <div className={styles.c}>
       <input
         type={"range"}
         min={type === "size" ? 2 : type === "complexity" ? 1 : 0}
-        max={type === "size" ? 150 : 100}
+        max={type === "size" ? maxSize : 100}
         value={val}
         onChange={e => {
           setVal(e.currentTarget.value);
