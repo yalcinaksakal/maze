@@ -103,7 +103,10 @@ const setScene = statusFunc => {
     //camera
 
     changeCamPos(
-      25 * (window.innerWidth > 600 ? complexity.size / 1.5 : complexity.size)
+      25 *
+        (window.innerWidth > 600
+          ? complexity.size / 1.4
+          : complexity.size * 1.6)
     );
     //worker
     dijkstraWorker?.terminate();
@@ -152,8 +155,9 @@ const setScene = statusFunc => {
       ]);
 
       dijkstraWorker.onmessage = e => {
-        statusFunc(statusActions.addDone(e.data.length));
         //empty nopaths data.type=emptyNoPaths
+        if (e.data.type === "emptyNoPaths" || !e.data.type)
+          statusFunc(statusActions.addDone(e.data.length));
 
         !e.data.type &&
           e.data.forEach(d => {
@@ -161,13 +165,13 @@ const setScene = statusFunc => {
             requestRenderIfNotRequested();
           });
 
-        if ((e.data.type = "nodesOfNoPaths")) {
-          // console.log(e.data.nodesOfNoPaths);
-          // dijkstraPaths.add(noPathDrawer(e.data.nodesOfNoPaths));
-          // dijkstraWorker.terminate();
-          // dijkstraWorker = null;
+        if (e.data.type === "nodesOfNoPaths") {
+          if (e.data.nodes)
+            dijkstraPaths.add(noPathDrawer(e.data.nodes, maze.start));
+          dijkstraWorker.terminate();
+          dijkstraWorker = null;
+          requestRenderIfNotRequested();
           // statusFunc(statusActions.stop());
-          // requestRenderIfNotRequested();
         }
       };
       // -------

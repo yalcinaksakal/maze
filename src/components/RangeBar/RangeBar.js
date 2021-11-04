@@ -19,7 +19,7 @@ const RangeBar = ({ type }) => {
     <div className={styles.c}>
       <input
         type={"range"}
-        min={type === "size" ? 2 : 0}
+        min={type === "size" ? 2 : type === "complexity" ? 1 : 0}
         max={type === "size" ? 150 : 100}
         value={val}
         onChange={e => {

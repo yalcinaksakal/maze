@@ -93,6 +93,8 @@ function handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY) {
 
 onmessage = function (e) {
   const [pathes, sizeX, sizeY] = e.data;
+  let terminated = 0;
+  let finished = false;
   init(sizeX);
 
   const indexer = input => [input % sizeX, input >= sizeX ? sizeY - 1 : 0];
@@ -115,9 +117,10 @@ onmessage = function (e) {
     subWorker.postMessage([x, y, pathes]);
     subWorker.onmessage = e => {
       const { dijkstra, previousNode, startx, starty } = e.data;
-      postMessage(
-        handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY)
-      );
+      if (!finished)
+        postMessage(
+          handleResults(dijkstra, previousNode, startx, starty, sizeX, sizeY)
+        );
 
       // if there is remaining load, assign it to this subworker
       const next = pickRandomly();
@@ -125,12 +128,15 @@ onmessage = function (e) {
         e.currentTarget.postMessage(next);
       } else {
         subWorker.terminate();
-        //count terminateds, if finishe return nodesofnopaths
-
-        // postMessage({
-        //   type: "nodesOfNoPaths",
-        //   nodesOfNoPaths,
-        // });
+        // count terminateds, if finished return nodesofnopaths
+        terminated++;
+        if (terminated === swNo && !finished) {
+          finished = true;
+          postMessage({
+            type: "nodesOfNoPaths",
+            nodes: Object.keys(nodesOfNoPaths).length ? nodesOfNoPaths : false,
+          });
+        }
       }
     };
   };

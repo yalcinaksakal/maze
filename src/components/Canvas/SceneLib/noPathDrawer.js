@@ -8,21 +8,20 @@ geometryCross2.rotateY(-Math.PI / 2);
 const matUp = new MeshBasicMaterial({ color: "red" });
 const matDown = new MeshBasicMaterial({ color: "black" });
 
-const noPathDrawer = nodes => {
+const noPathDrawer = (nodes, start) => {
   const createCross = (g, x, y, dir) => {
-    const result = new Mesh(g, dir > 0 ? matUp : matDown);
+    const result = new Mesh(g, dir < 0 ? matUp : matDown);
     result.position.set(x, 3, y);
     result.castShadow = true;
     return result;
   };
 
   const result = new Group();
-
   let x, y;
   for (const [node, dir] of Object.entries(nodes)) {
     y = node.split("-");
-    x = +y[0] * 25 + 13;
-    y = +y[1] * 25 + 13;
+    x = +y[0] * 25 + 13 + start;
+    y = +y[1] * 25 + 13 + start;
     result.add(createCross(geometryCross1, x, y, dir));
     result.add(createCross(geometryCross2, x, y, dir));
   }
