@@ -8,17 +8,17 @@ import {
   Vector3,
 } from "three";
 
-const geometryArrowUp = new ConeGeometry(10, 20, 16);
+const geometryArrowUp = new ConeGeometry(4, 20, 16);
 geometryArrowUp.rotateX(Math.PI / 2);
 
-const geometryArrowDown = new ConeGeometry(10, 20, 16);
+const geometryArrowDown = new ConeGeometry(4, 20, 16);
 geometryArrowDown.rotateX(-Math.PI / 2);
 
 const dDrawer = (data, start) => {
   const { path, direction } = data;
   const points = [];
 
-  const shift = direction === "up" ? -2 : 2;
+  const shift = direction === "up" ? -5 : 5;
 
   const rndm = () => Math.floor(Math.random() * 256);
 
@@ -28,7 +28,7 @@ const dDrawer = (data, start) => {
     points.push(
       new Vector3(
         start + 13 + point.x * 25 + shift,
-        10,
+        4,
         start + 13 + point.y * 25
       )
     );
@@ -42,7 +42,7 @@ const dDrawer = (data, start) => {
 
   const createStartFigure = geometry => {
     const result = new Mesh(geometry, new MeshBasicMaterial({ color }));
-    result.position.set(firstPoint.x, 5, firstPoint.z);
+    result.position.set(firstPoint.x, firstPoint.y, firstPoint.z);
     result.castShadow = true;
     return result;
   };
