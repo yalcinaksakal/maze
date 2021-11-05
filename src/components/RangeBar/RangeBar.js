@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   changeComplexity,
   changeSize,
@@ -8,21 +8,23 @@ import {
 import styles from "./RangeBar.module.scss";
 
 const RangeBar = ({ type }) => {
-  const maxSize =
-    window.innerWidth > 500 ? { max: 150, val: 50 } : { max: 70, val: 35 };
   const [val, setVal] = useState(
-    type === "speed" ? 1 : type === "size" ? maxSize.val : 70
+    type === "speed" ? 1 : type === "size" ? 50 : 70
   );
+  const [maxVal, setMaxval] = useState(type === "size" ? 150 : 100);
   const style = {
     color: type === "speed" && +val === 0 ? "black" : "white",
   };
 
+  useEffect(() => {
+    if (window.innerWidth < 500) setMaxval(100);
+  }, []);
   return (
     <div className={styles.c}>
       <input
         type={"range"}
         min={type === "size" ? 2 : type === "complexity" ? 1 : 0}
-        max={type === "size" ? maxSize.max : 100}
+        max={maxVal}
         value={val}
         onChange={e => {
           setVal(e.currentTarget.value);

@@ -40,6 +40,7 @@ const noPathDrawer = (nodes, start) => {
   const result = new Group();
   if (up.length) {
     const mergedUps = mergeBufferGeometries(up, false);
+
     result.add(new Mesh(mergedUps, matUp));
   }
   if (down.length) {

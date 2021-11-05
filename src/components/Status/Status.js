@@ -8,7 +8,9 @@ const Status = () => {
   return (
     calculating && (
       <div className={styles.p}>
-        {`Finding shortest paths: ${done} / ${total} done`} <Dots />
+        Finding shortest paths
+        <br />
+        {`${done} / ${total} done`} <Dots />
       </div>
     )
   );
