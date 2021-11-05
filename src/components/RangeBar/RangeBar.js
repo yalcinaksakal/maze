@@ -8,19 +8,21 @@ import {
 import styles from "./RangeBar.module.scss";
 
 const RangeBar = ({ type }) => {
+  const maxSize =
+    window.innerWidth > 500 ? { max: 150, val: 50 } : { max: 70, val: 35 };
   const [val, setVal] = useState(
-    type === "speed" ? 1 : type === "size" ? 50 : 70
+    type === "speed" ? 1 : type === "size" ? maxSize.val : 70
   );
   const style = {
     color: type === "speed" && +val === 0 ? "black" : "white",
   };
-  const maxSize = window.innerWidth > 500 ? 150 : 75;
+
   return (
     <div className={styles.c}>
       <input
         type={"range"}
         min={type === "size" ? 2 : type === "complexity" ? 1 : 0}
-        max={type === "size" ? maxSize : 100}
+        max={type === "size" ? maxSize.max : 100}
         value={val}
         onChange={e => {
           setVal(e.currentTarget.value);
