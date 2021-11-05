@@ -7,9 +7,9 @@ const createPlane = dimension => {
   const plane = new Mesh(
     new PlaneGeometry(dimension, dimension + 300, 1, 1),
     new MeshStandardMaterial({
-      color: "beige",
-      // transparent: true,
-      // opacity: 0.3,
+      color: "white",
+      transparent: true,
+      opacity: 0.5,
     })
   );
 
