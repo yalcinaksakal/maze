@@ -14,7 +14,7 @@ const RangeBar = ({ type }) => {
   const style = {
     color: type === "speed" && +val === 0 ? "black" : "white",
   };
-  const maxSize = window.innerWidth > 500 ? 150 : 100;
+  const maxSize = window.innerWidth > 500 ? 150 : 75;
   return (
     <div className={styles.c}>
       <input
