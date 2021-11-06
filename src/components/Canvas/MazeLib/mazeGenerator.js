@@ -72,6 +72,18 @@ class MazeGenerator {
   getWalls(walls) {
     let wall;
     walls = [];
+    const pushWall = (x, y, rightOrDown) => {
+      wall =
+        rightOrDown === "right"
+          ? boxGeometryVertical.clone()
+          : boxGeometryHorizantal.clone();
+      x = this.start + 25 * x + (rightOrDown === "right" ? 25 : 13);
+      y = this.start + 25 * y + (rightOrDown === "right" ? 13 : 0);
+      positionHelper.position.set(x, -7.5, y);
+      positionHelper.updateWorldMatrix(true, false);
+      wall.applyMatrix4(positionHelper.matrixWorld);
+      walls.push(wall);
+    };
     const doesPathExist = (x1, y1, x2, y2) =>
       this.pathMap[`${x1}-${y1}:${x2}-${y2}`] ||
       this.pathMap[`${x2}-${y2}:${x1}-${y1}`];
@@ -92,21 +104,10 @@ class MazeGenerator {
           if (Math.random() > this.mazeComplexity.c)
             // console.log(`${i}-${j}:${i}-${j - 1}`);
             this.pathMap[`${i}-${j}:${i}-${j - 1}`] = 1;
-          else {
-            wall = boxGeometryHorizantal.clone();
-            positionHelper.position.set(
-              this.start + 13 + i * 25,
-              -7.5,
-              this.start + j * 25
-            );
-            // wall.castShadow = true;
-            // wall.receiveShadow = true;
-            positionHelper.updateWorldMatrix(true, false);
-            wall.applyMatrix4(positionHelper.matrixWorld);
-            walls.push(wall);
-          }
+          else pushWall(i, j, "down");
         }
         //right wall
+
         if (!doesPathExist(i, j, i + 1, j)) {
           if (
             Math.random() > this.mazeComplexity.c &&
@@ -116,17 +117,12 @@ class MazeGenerator {
             // console.log(`${i}-${j}:${i + 1}-${j}`);
             this.pathMap[`${i}-${j}:${i + 1}-${j}`] = 1;
           } else {
-            wall = boxGeometryVertical.clone();
-            positionHelper.position.set(
-              this.start + 25 + i * 25,
-              -7.5,
-              this.start + 13 + j * 25
-            );
-            // wall.castShadow = true;
-            // wall.receiveShadow = true;
-            positionHelper.updateWorldMatrix(true, false);
-            wall.applyMatrix4(positionHelper.matrixWorld);
-            walls.push(wall);
+            pushWall(i, j, "right");
+
+            if (j === 0 || j === this.mazeSizeY - 1) {
+              pushWall(i, !j ? -1 : this.mazeSizeY, "right");
+              pushWall(i, !j ? -2 : this.mazeSizeY + 1, "right");
+            }
           }
         }
       }

@@ -101,13 +101,14 @@ const setScene = statusFunc => {
     maze = new MazeGenerator(visitor);
 
     //camera
-
+    controls.reset();
     changeCamPos(
       25 *
         (window.innerWidth > 600
           ? complexity.size / 1.4
           : complexity.size * 1.6)
     );
+
     //worker
     dijkstraWorker?.terminate();
     dijkstraWorker = new Worker("./dijkstraWorker.js");
