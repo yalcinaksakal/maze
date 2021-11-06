@@ -29,7 +29,7 @@ const dDrawer = (data, start) => {
       new Vector3(
         start + 13 + point.x * 25 + shift,
         4,
-        start + 13 + point.y * 25
+        start + 13 + point.y * 25 + shift
       )
     );
 
