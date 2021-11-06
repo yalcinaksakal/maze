@@ -162,9 +162,7 @@ const setScene = statusFunc => {
 
       dijkstraWorker.onmessage = e => {
         //empty nopaths data.type=emptyNoPaths
-        if (e.data.type === "emptyNoPaths" || !e.data.type)
-          statusFunc(statusActions.addDone(e.data.length));
-
+        if (!e.data.type) statusFunc(statusActions.addDone(e.data.length));
         !e.data.type &&
           e.data.forEach(d => {
             dijkstraPaths.add(...dDrawer(d, maze.start));
@@ -177,6 +175,7 @@ const setScene = statusFunc => {
           dijkstraWorker.terminate();
           dijkstraWorker = null;
           requestRenderIfNotRequested();
+          statusFunc(statusActions.stop());
           // statusFunc(statusActions.stop());
         }
       };
