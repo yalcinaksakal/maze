@@ -128,6 +128,14 @@ const setScene = statusFunc => {
     }
 
     statusFunc(statusActions.stop());
+
+    statusFunc(
+      statusActions.setCalculating({
+        total: 2 * maze.mazeSizeX,
+        calculating: true,
+      })
+    );
+    requestRenderIfNotRequested();
   };
 
   const processMaze = () => {
@@ -148,12 +156,12 @@ const setScene = statusFunc => {
 
       addPossibleCrossPathes(maze.pathMap, maze.mazeSizeX, maze.mazeSizeY);
       // starting workers
-      statusFunc(
-        statusActions.setCalculating({
-          total: 2 * maze.mazeSizeX,
-          calculating: true,
-        })
-      );
+      // statusFunc(
+      //   statusActions.setCalculating({
+      //     total: 2 * maze.mazeSizeX,
+      //     calculating: true,
+      //   })
+      // );
 
       dijkstraWorker.postMessage([
         maze.pathMap,
