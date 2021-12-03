@@ -19,10 +19,11 @@ function dijkstraInit(x, y, pathLines) {
   visitedNodes[`${x}-${y}`] = 1;
 }
 
+let low, mid, high;
 const setDijkstraSortedArray = (x, y, value, processType) => {
-  let low = 0,
-    mid = 0,
-    high = unvisitedDijkstraSortedArray.length;
+  low = 0;
+  mid = 0;
+  high = unvisitedDijkstraSortedArray.length;
   while (low < high) {
     mid = (low + high) >>> 1;
     if (unvisitedDijkstraSortedArray[mid].value < value) low = mid + 1;
@@ -46,29 +47,25 @@ const setDijkstraSortedArray = (x, y, value, processType) => {
   //add
   unvisitedDijkstraSortedArray.splice(low, 0, { x, y, value });
 };
+let oldDistance, isNeighbourAccesable, newDistance;
 
-function setNewDistance(x1, y1, x2, y2, newDistance) {
+function setNewDistance(x1, y1, x2, y2, nD) {
   previousNode[`${x2}-${y2}`] = { x: x1, y: y1 };
-  dijkstra[`${x2}-${y2}`] = newDistance;
+  oldDistance = dijkstra[`${x2}-${y2}`];
+  dijkstra[`${x2}-${y2}`] = nD;
   //if this node x2,y2 is visited , dont add into sorted array
   if (visitedNodes[`${x2}-${y2}`]) return;
   //if not visited, find old place and delete it from sorted arr
-  setDijkstraSortedArray(x2, y2, newDistance, "delete");
+  if (oldDistance) setDijkstraSortedArray(x2, y2, oldDistance, "delete");
   //find the correct position and add node to sorted arr
-  setDijkstraSortedArray(x2, y2, newDistance, "add");
+  setDijkstraSortedArray(x2, y2, nD, "add");
 }
 // 12-0:13-0  = 1  pathes from:to
-const isAccessable = (x1, y1, x2, y2) => {
-  if (pathes[`${x1}-${y1}:${x2}-${y2}`])
-    return pathes[`${x1}-${y1}:${x2}-${y2}`];
-  if (pathes[`${x2}-${y2}:${x1}-${y1}`])
-    return pathes[`${x2}-${y2}:${x1}-${y1}`];
-  return false;
-};
+const isAccessable = (x1, y1, x2, y2) =>
+  pathes[`${x1}-${y1}:${x2}-${y2}`] || pathes[`${x2}-${y2}:${x1}-${y1}`];
 
 function shortestPath(x, y) {
   //find all accessable neighbours
-  let isNeighbourAccesable, newDistance;
   for (let i = -1; i < 2; i++)
     for (let j = -1; j < 2; j++) {
       if (!i && !j) continue;
@@ -77,9 +74,10 @@ function shortestPath(x, y) {
       // isNeighbourAccesable holds distance to it
       newDistance = dijkstra[`${x}-${y}`] + isNeighbourAccesable;
       //if shortest path to this neighbour is infinity(assume undefined as infinity)
-      if (dijkstra[`${x + i}-${y + j}`] === undefined)
-        setNewDistance(x, y, x + i, y + j, newDistance);
-      else if (dijkstra[`${x + i}-${y + j}`] > newDistance)
+      if (
+        dijkstra[`${x + i}-${y + j}`] === undefined ||
+        dijkstra[`${x + i}-${y + j}`] > newDistance
+      )
         setNewDistance(x, y, x + i, y + j, newDistance);
     }
 }

@@ -111,6 +111,7 @@ const setScene = statusFunc => {
 
     //worker
     dijkstraWorker?.terminate();
+    dijkstraWorker = null;
     dijkstraWorker = new Worker("./dijkstraWorker.js");
 
     //dijkstraPaths,lines,walls
